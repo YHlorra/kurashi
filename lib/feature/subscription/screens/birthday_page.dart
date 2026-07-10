@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/designsystem/colors.dart';
+import '../../../core/designsystem/form_shell.dart';
 import '../../../core/lunar/lunar_service.dart';
 import '../../../data/models/subscription.dart';
 import '../../../feature/subscription/widgets/sheet_scaffold.dart';
@@ -78,10 +79,10 @@ class _BirthdayPageState extends ConsumerState<BirthdayPage> {
 
     return Scaffold(
       backgroundColor: AppColors.bg,
-      appBar: _AppBar(
+      appBar: FormAppBar(
         title: '新建生日',
-        onSubmit: _submit,
-        canSubmit: canSubmit,
+        onAction: _submit,
+        actionEnabled: canSubmit,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -200,69 +201,12 @@ class _BirthdayPageState extends ConsumerState<BirthdayPage> {
           ],
         ),
       ),
-      bottomNavigationBar: _BottomBar(onSubmit: _submit, canSubmit: canSubmit),
+      bottomNavigationBar: FormBottomBar(onAction: _submit, actionEnabled: canSubmit),
     );
   }
 }
 
 // ── 通用组件 ────────────────────────────────────────────────────────────
-
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final VoidCallback onSubmit;
-  final bool canSubmit;
-
-  const _AppBar({
-    required this.title,
-    required this.onSubmit,
-    required this.canSubmit,
-  });
-
-  @override
-  Size get preferredSize => const Size.fromHeight(52);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.borderSoft, width: 1)),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-              color: AppColors.fg,
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          Center(
-            child: Text(
-              title,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: AppColors.fg),
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: canSubmit ? onSubmit : null,
-              child: Text(
-                '添加',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: canSubmit ? AppColors.fg : AppColors.muted,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _SectionLabel extends StatelessWidget {
   final String label;
@@ -273,38 +217,6 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       label,
       style: const TextStyle(fontSize: 12, color: AppColors.muted, letterSpacing: 0.48),
-    );
-  }
-}
-
-class _BottomBar extends StatelessWidget {
-  final VoidCallback onSubmit;
-  final bool canSubmit;
-
-  const _BottomBar({required this.onSubmit, required this.canSubmit});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        child: SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
-            onPressed: canSubmit ? onSubmit : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.fg,
-              foregroundColor: AppColors.bg,
-              disabledBackgroundColor: AppColors.muted,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-            ),
-            child: const Text('添加', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-          ),
-        ),
-      ),
     );
   }
 }

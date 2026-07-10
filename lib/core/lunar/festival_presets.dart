@@ -41,56 +41,6 @@ class FestivalPreset {
     this.leadDays = 7,
     this.specialType,
   });
-
-  FestivalPreset copyWith({
-    String? title,
-    SubType? type,
-    Calendar? calendar,
-    TriggerMode? mode,
-    int? anchorMonth,
-    int? anchorDay,
-    int? leadDays,
-    SpecialFestivalType? specialType,
-  }) {
-    return FestivalPreset(
-      title: title ?? this.title,
-      type: type ?? this.type,
-      calendar: calendar ?? this.calendar,
-      mode: mode ?? this.mode,
-      anchorMonth: anchorMonth ?? this.anchorMonth,
-      anchorDay: anchorDay ?? this.anchorDay,
-      leadDays: leadDays ?? this.leadDays,
-      specialType: specialType ?? this.specialType,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is FestivalPreset &&
-        other.title == title &&
-        other.type == type &&
-        other.calendar == calendar &&
-        other.mode == mode &&
-        other.anchorMonth == anchorMonth &&
-        other.anchorDay == anchorDay &&
-        other.leadDays == leadDays &&
-        other.specialType == specialType;
-  }
-
-  @override
-  int get hashCode {
-    return Object.hash(
-      title,
-      type,
-      calendar,
-      mode,
-      anchorMonth,
-      anchorDay,
-      leadDays,
-      specialType,
-    );
-  }
 }
 
 /// 中国节日预设（9 项）。

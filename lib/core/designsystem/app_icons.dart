@@ -57,18 +57,6 @@ class AppIcons {
   static Widget history({Color? color, double size = 22}) =>
       IconPark.history.outline(fill: color, size: size, strokeWidth: 2);
 
-  /// 编辑（铅笔）
-  static Widget edit({Color? color, double size = 16}) =>
-      IconPark.edit.outline(fill: color, size: size, strokeWidth: 2);
-
-  /// 删除 / 垃圾桶
-  static Widget delete({Color? color, double size = 16}) =>
-      IconPark.deleteOne.outline(fill: color, size: size, strokeWidth: 2);
-
-  /// 恢复 / 刷新箭头
-  static Widget restore({Color? color, double size = 16}) =>
-      IconPark.refresh.outline(fill: color, size: size, strokeWidth: 2);
-
   /// 右箭头 / 返回
   static Widget right({Color? color, double size = 16}) =>
       IconPark.rightC.outline(fill: color, size: size, strokeWidth: 2);
@@ -122,20 +110,6 @@ class AppIcons {
   /// 自定义（加号）
   static Widget custom({Color? color, double size = 24}) =>
       IconPark.add.outline(fill: color, size: size, strokeWidth: 2);
-
-  // ─── Todo 类型图标 ───────────────────────────────────
-
-  /// 待办（圆圈 + 对勾）
-  static Widget todoType({Color? color, double size = 24}) =>
-      IconPark.correct.outline(fill: color, size: size, strokeWidth: 2);
-
-  /// 习惯 / 循环
-  static Widget habit({Color? color, double size = 24}) =>
-      IconPark.cycle.outline(fill: color, size: size, strokeWidth: 2);
-
-  /// 事件 / 时钟
-  static Widget event({Color? color, double size = 24}) =>
-      IconPark.time.outline(fill: color, size: size, strokeWidth: 2);
 
   // ─── 冰箱历史操作元数据 ──────────────────────────────
 

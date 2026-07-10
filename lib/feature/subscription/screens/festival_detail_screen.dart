@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/designsystem/colors.dart';
+import '../../../core/designsystem/form_shell.dart';
 import '../../../core/lunar/festival_presets.dart';
 import '../../../core/lunar/lunar_service.dart';
 import '../../../data/models/subscription.dart';
@@ -80,9 +81,8 @@ class _FestivalDetailScreenState extends ConsumerState<FestivalDetailScreen> {
           return Column(
             children: [
               // AppBar
-              _AppBar(
+              FormAppBar(
                 title: _isCn ? '中国节日' : '西方节日',
-                onBack: () => Navigator.of(context).maybePop(),
               ),
               // Body
               Expanded(
@@ -168,52 +168,6 @@ class _SectionHeader extends StatelessWidget {
           fontSize: 13,
           color: AppColors.muted,
         ),
-      ),
-    );
-  }
-}
-
-// ── AppBar ────────────────────────────────────────────────────────────
-
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final VoidCallback onBack;
-
-  const _AppBar({required this.title, required this.onBack});
-
-  @override
-  Size get preferredSize => const Size.fromHeight(52);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.borderSoft, width: 1)),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Back button
-          Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-              color: AppColors.fg,
-              onPressed: onBack,
-            ),
-          ),
-          // Title
-          Center(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: AppColors.fg,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

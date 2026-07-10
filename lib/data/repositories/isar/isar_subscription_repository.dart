@@ -4,11 +4,11 @@ import '../../../core/lunar/festival_presets.dart';
 import '../../models/subscription.dart';
 import '../subscription_repository.dart';
 
-/// 订阅仓库的 Isar 实现（阶段 2.1 替换 FakeSubscriptionRepository）。
+/// 订阅仓库的 Isar 实现。
 ///
 /// setActiveByType 在 active=true 且 type 为节日（cnFestival/westernFestival）时，
 /// 调用 festival_presets 批量 upsert 该 type 的预设 Subscription；其余情况仅批量
-/// 切换 active flag（与 Fake 行为一致，便于回滚）。
+  /// 切换 active flag
 ///
 /// INVARIANT（2026-07-09）：isar_plus 的 put/delete 通过
 /// `getWriteTxn(consume: true, ...)` 依赖当前已有的写事务——**不会自己开启**。

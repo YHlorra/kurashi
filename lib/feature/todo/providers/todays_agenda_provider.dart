@@ -31,22 +31,6 @@ class SubAgendaItem extends AgendaItem {
   const SubAgendaItem(this.sub);
 }
 
-/// 设计图固定顺序：(类型, id) 列表。
-///
-/// 仅 todo + habit 交错（7 项）。订阅锚点不写死：所有 active 订阅按
-/// daysUntil 升序、最多 60 天，追加到 agenda 末尾；硬编码 sub 会让其它已订
-/// 节日/账单/生日被漏掉（典型症状：只显示七夕）。
-/// 严格对应 mobile-android-todo.html 列表 9 项中 todo/habit 部分。
-const _agendaOrder = <(String, int)>[
-  ('todo', 1), // 回邮件给导师（截止 今天 18:00）
-  ('todo', 2), // 买牛奶 + 鸡蛋（截止 明天，warn）
-  ('habit', 1), // 阅读 30 分钟（2/3，绿环）
-  ('todo', 3), // 整理上周复盘（已完成 → 阶段 2 已从 agenda 过滤，仍保留为设计文档）
-  ('habit', 2), // 喝 8 杯水（7/7，黑环）
-  ('todo', 4), // 续保家庭意外险（截止 7/2，warn）
-  ('habit', 3), // 跑步 5km（5/7，琥珀环）
-];
-
 /// 今日事项聚合 Provider
 /// 组合 Todo + Habit + Subscription 三个 repo stream，
 /// 输出按设计图固定顺序混排的 `List<AgendaItem>`（不是按 type 分组）
@@ -155,39 +139,16 @@ List<AgendaItem> _buildAgenda(
 }) {
   final now = today ?? DateTime.now();
   final result = <AgendaItem>[];
-  final usedTodoIds = <int>{};
-  final usedHabitIds = <int>{};
 
   // 阶段 2：提前过滤掉已完成 todo —— 不再出现在今日视图。
   final activeTodos = todos.where((t) => !t.completed).toList();
 
-  // 1. 按设计图固定顺序填入（仅 todo + habit）
-  for (final (type, id) in _agendaOrder) {
-    switch (type) {
-      case 'todo':
-        final t = _findTodo(activeTodos, id);
-        if (t != null) {
-          result.add(TodoAgendaItem(t));
-          usedTodoIds.add(id);
-        }
-      case 'habit':
-        final h = _findHabit(habits, id);
-        if (h != null) {
-          result.add(HabitAgendaItem(h));
-          usedHabitIds.add(id);
-        }
-      case 'sub':
-        // 订阅不再硬编码 —— 下方统一按 active + daysUntil 追加。
-        break;
-    }
-  }
-
-  // 2. 追加未在固定顺序中的代办与习惯（新增项追加到末尾）
+  // 1. 追加所有 active 代办与习惯（按创建顺序）
   for (final t in activeTodos) {
-    if (!usedTodoIds.contains(t.id)) result.add(TodoAgendaItem(t));
+    result.add(TodoAgendaItem(t));
   }
   for (final h in habits) {
-    if (!usedHabitIds.contains(h.id)) result.add(HabitAgendaItem(h));
+    result.add(HabitAgendaItem(h));
   }
 
   // 3. 订阅锚点：active + daysUntil ∈ [0, 365]，按距今天数升序。
@@ -208,16 +169,3 @@ List<AgendaItem> _buildAgenda(
   return result;
 }
 
-TodoItem? _findTodo(List<TodoItem> items, int id) {
-  for (final t in items) {
-    if (t.id == id) return t;
-  }
-  return null;
-}
-
-Habit? _findHabit(List<Habit> items, int id) {
-  for (final h in items) {
-    if (h.id == id) return h;
-  }
-  return null;
-}

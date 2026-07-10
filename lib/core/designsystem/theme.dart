@@ -22,19 +22,6 @@ class AppFonts {
     'Arial',
   ];
 
-  /// 等宽字体 fallback 链（JetBrains Mono 已 bundle，fallback 仅兜底）
-  static const List<String> monoFallback = [
-    'Menlo',
-    'Consolas',
-    'Courier New',
-    'monospace',
-  ];
-
-  /// 等宽 TextStyle 基础（调用方按需覆盖 fontSize/weight/color 等）
-  static const TextStyle mono = TextStyle(
-    fontFamily: 'JetBrainsMono',
-    fontFamilyFallback: monoFallback,
-  );
 }
 
 /// 全局 ThemeData —— Helvetica 单色调美学，非 Material 3 默认紫色
@@ -65,19 +52,6 @@ ThemeData appTheme() {
         color: AppColors.fg,
       ),
     ),
-    // Chip —— pill 圆角
-    chipTheme: ChipThemeData(
-      backgroundColor: AppColors.bg,
-      selectedColor: AppColors.fg,
-      labelStyle: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: AppColors.fg,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-      shape: const StadiumBorder(),
-      side: const BorderSide(color: AppColors.border, width: 1),
-    ),
     // BottomSheet —— 圆角 24
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: AppColors.bg,
@@ -93,35 +67,6 @@ ThemeData appTheme() {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
-    ),
-    // 底部导航栏 —— 白底、indicator 黑色、高度 80
-    navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: AppColors.bg,
-      indicatorColor: AppColors.fg,
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      height: 80,
-      labelTextStyle: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) {
-          return const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-            color: AppColors.fg,
-          );
-        }
-        return const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: AppColors.muted,
-        );
-      }),
-      iconTheme: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) {
-          return const IconThemeData(color: AppColors.fg, size: 24);
-        }
-        return const IconThemeData(color: AppColors.muted, size: 24);
-      }),
     ),
   );
 }

@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/designsystem/colors.dart';
+import '../../../core/designsystem/form_shell.dart';
 import '../../../core/notifications/notification_scheduler.dart';
 import '../../../data/models/subscription.dart';
 import '../../../data/repositories/providers.dart';
@@ -124,52 +126,6 @@ class SheetScaffold extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Pill-shaped preset chip — used by the new category sheets for item-type
-/// chip groups (home presets, pet care types, document types, etc.).
-///
-/// Selected: fg bg. Unselected: bg + border.
-class PresetChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const PresetChip({
-    super.key,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        height: 36,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.fg : AppColors.bg,
-          border: Border.all(
-            color: isSelected ? AppColors.fg : AppColors.border,
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? AppColors.bg : AppColors.fg,
-          ),
         ),
       ),
     );

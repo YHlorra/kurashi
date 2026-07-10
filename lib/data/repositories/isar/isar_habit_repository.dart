@@ -4,7 +4,7 @@ import '../../models/habit.dart';
 import '../../models/habit_checkin.dart';
 import '../habit_repository.dart';
 
-/// 习惯仓库的 Isar 实现（阶段 2.1 替换 FakeHabitRepository）。
+/// 习惯仓库的 Isar 实现。
 ///
 /// INVARIANT（2026-07-09）：isar_plus 的 put/delete/clear 通过
 /// `getWriteTxn(consume: true, ...)` 依赖当前已有的写事务——**不会自己开启**。
@@ -36,7 +36,7 @@ class IsarHabitRepository implements HabitRepository {
 
   @override
   Future<void> deleteHabit(int id) async {
-    // 级联删除该习惯的打卡记录，保持与 Fake 行为一致。
+    // 级联删除该习惯的打卡记录
     isar.write((isar) {
       isar.habits.delete(id);
       final checkins = isar.habitCheckins.where().habitIdEqualTo(id).findAll();
@@ -48,7 +48,7 @@ class IsarHabitRepository implements HabitRepository {
 
   @override
   Future<void> checkin(int habitId, DateTime date) async {
-    // 幂等：若当日已打卡则跳过（与 Fake 行为一致）。
+    // 幂等：若当日已打卡则跳过
     // 注：date 取 dayStart 归一化到 00:00，便于按天匹配。
     final dayStart = DateTime(date.year, date.month, date.day);
     final dayEnd = dayStart.add(const Duration(days: 1));

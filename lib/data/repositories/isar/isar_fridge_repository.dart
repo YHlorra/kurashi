@@ -9,7 +9,7 @@ import '../../models/fridge_change_log.dart';
 import '../../models/fridge_item.dart';
 import '../fridge_repository.dart';
 
-/// 冰箱仓库的 Isar 实现（阶段 2.1 替换 FakeFridgeRepository；阶段 2.x 增加变更日志）。
+/// 冰箱仓库的 Isar 实现。
 ///
 /// 4 个 mutation（addItem / updateItem / removeItem / restoreItem）都包在
 /// `isar.write((isar) => ...)` 中，与 FridgeChangeLog 写入原子。

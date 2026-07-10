@@ -28,7 +28,7 @@ enum ReportScope { day, week, month, all }
 /// FridgeChangeLog，且同一个 writeTxn 内提交——保证数据与日志同生同灭。
 /// 应用设置（保留策略）也由本抽象承载（避免新增 SettingsRepository）。
 abstract class FridgeRepository {
-  /// 食材流（监听 Isar lazy stream / Fake broadcast）。
+  /// 食材流（Isar lazy stream）。
   Stream<List<FridgeItem>> watchAll();
 
   // ── Mutation（每个 mutation 内部必须追加一条 FridgeChangeLog，写入同一事务）
@@ -79,7 +79,7 @@ abstract class FridgeRepository {
   /// 监听应用设置流。单行 collection（id=0）。
   Stream<AppSettings> watchSettings();
 
-  /// 读当前设置；若不存在则返回默认 {0, now}（Fake 也允许）。
+  /// 读当前设置；若不存在则返回默认 {0, now}。
   Future<AppSettings> getSettings();
 
   /// 更新应用设置（仅覆盖本次）。

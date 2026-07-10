@@ -1300,8 +1300,8 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
       _selectedTag = trimmed;
       _isEditingCustomTag = false;
     });
-    // Persist to AppSettings
-    final repo = ref.read(appSettingsRepositoryProvider);
+    // 持久化到 FridgeRepository（冰箱标签是冰箱数据的一部分）
+    final repo = ref.read(fridgeRepositoryProvider);
     final current = await repo.getSettings();
     final currentTags = current.fridgeTags;
     if (!currentTags.contains(trimmed)) {
@@ -1355,7 +1355,7 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
 
     // ── 新增模式：addItem + 联动补货 todo + 调度通知
     final item = FridgeItem(
-      id: 0, // Fake repo 会自动分配 ID
+      id: 0, // Isar autoIncrement 会自动分配 ID
       name: name,
       quantity: qty.isEmpty ? '1 份' : qty,
       addedDate: DateTime.now(),
@@ -1424,6 +1424,14 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
                       controller: _qtyController,
                       focusNode: _qtyFocusNode,
                       onPresetTap: _pickQtyPreset,
+                      onCustomTap: () => setState(() {
+                        _qtyMode = _QtyMode.custom;
+                        // 若当前值是预设，清空让用户从头输入
+                        if (_qtyPresets.contains(_qtyController.text.trim())) {
+                          _qtyController.clear();
+                        }
+                        _qtyFocusNode.requestFocus();
+                      }),
                     ),
                   ),
                   _FieldRow(
@@ -1749,7 +1757,7 @@ class _NameEditor extends StatelessWidget {
   }
 }
 
-/// 数量行展开：chip 群
+/// 数量行展开：chip 群 + 自定义 TextField
 class _QtyEditor extends StatelessWidget {
   final String selected;
   final _QtyMode mode;
@@ -1757,6 +1765,7 @@ class _QtyEditor extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final ValueChanged<String> onPresetTap;
+  final VoidCallback onCustomTap;
 
   const _QtyEditor({
     required this.selected,
@@ -1765,6 +1774,7 @@ class _QtyEditor extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     required this.onPresetTap,
+    required this.onCustomTap,
   });
 
   @override
@@ -1789,8 +1799,42 @@ class _QtyEditor extends StatelessWidget {
                   isSelected: selected == p,
                   onTap: () => onPresetTap(p),
                 ),
+              _FridgeChip(
+                label: '自定义',
+                isSelected: mode == _QtyMode.custom,
+                isCustom: true,
+                onTap: onCustomTap,
+              ),
             ],
           ),
+          if (mode == _QtyMode.custom) ...[
+            const SizedBox(height: 10),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: AppColors.borderSoft, width: 1),
+                ),
+              ),
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => FocusScope.of(context).unfocus(),
+                decoration: const InputDecoration(
+                  hintText: '例如：2 盒、330 ml',
+                  hintStyle: TextStyle(
+                    color: AppColors.muted,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                ),
+                style: const TextStyle(fontSize: 15, color: AppColors.fg),
+              ),
+            ),
+          ],
         ],
       ),
     );

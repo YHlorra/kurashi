@@ -3,7 +3,7 @@ import 'package:isar_plus/isar_plus.dart';
 import '../../models/todo_item.dart';
 import '../todo_repository.dart';
 
-/// 待办事项仓库的 Isar 实现（阶段 2.1 替换 FakeTodoRepository）。
+/// 待办事项仓库的 Isar 实现。
 ///
 /// 所有写操作必须包在 `isar.write(...)` 里——isar_plus 的 put/delete
 /// 不会自动开启事务，裸调会抛 WriteTxnRequiredError。
