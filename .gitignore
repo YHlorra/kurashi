@@ -1,0 +1,96 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# OpenCode deepwork scratch (not tracked)
+.slim/deepwork/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Android build cache & machine-specific
+android/.gradle/
+android/local.properties
+
+# npm / node tooling (visual regression tests, web preview)
+node_modules/
+
+# 上架级签名密钥（不可逆资产，丢失 = 之前签的所有 APK 不能再升级）
+/android/key.properties
+/android/keystore/
+
+# ============================================================
+# Internal / dev-only — excluded from open-source release
+# ============================================================
+
+# Session notes & internal research
+SESSION.md
+SUBSCRIPTION_CATEGORIES_RESEARCH.md
+
+# Internal design docs, specs, prototypes, feedback, investigations
+docs/
+
+# OpenSpec change management
+openspec/
+
+# Debug tools, reference screenshots, visual regression scripts
+tools/
+
+# AI tool scratch space
+.slim/
+.trae/
+.workbuddy/
+
+# Debug / build artifacts (not committed)
+analyze-*.txt
+run-output.txt
+stderr.txt
+stdout.txt
+test-stdout.txt
+
+# Debug screenshots
+device-shot-*.png
+issue-*.png
+shot-*.png
+
+# Visual regression test infra (pixelmatch/playwright) — keep package.json for web serve
+package-lock.json

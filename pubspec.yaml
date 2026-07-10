@@ -1,0 +1,109 @@
+name: kurashi
+description: "kurashi (暮らし) — Todo + Periodic Reminders + Fridge. Lunar-calendar aware, local-first, Android + iOS."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  # Dart collection utilities (groupBy, etc.)
+  collection: ^1.1.2
+  flutter_localizations:
+    sdk: flutter
+  go_router: ^14.8.1
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  path_provider: ^2.0.15
+  isar_plus: ^1.3.7
+  # isar_plus 在 Android 设备上需要单独的原生库包（libisar_plus.so）。
+  # 注意：此包只支持 Android/iOS，桌面/Web 构建会失败 → 在 providers.dart 中用
+  # Platform.isAndroid/isIOS 做运行时分支，桌面走 Fake（内存 mock）。
+  isar_plus_flutter_libs: ^1.3.7
+  lunar: ^1.7.8
+  flutter_local_notifications: ^22.0.1
+  workmanager: ^0.9.0+3
+  timezone: ^0.11.1 # flutter_local_notifications 传递依赖，zonedSchedule 需直接引用
+  # System share — JSON export from fridge history
+  share_plus: ^10.0.0
+  # IconPark 图标库（字节跳动开源 SVG 图标，outline/fill/twoTone/multiColor 多主题，可配置 strokeWidth）
+  flutter_icon_park: ^0.0.1
+  # 启动屏：OS 层画 kurashi 文字 logo（mmX 生成），与 Flutter 首帧 /todo 视觉一致
+  flutter_native_splash: ^2.4.0
+  # Fade-in animations for shopping list items
+  flutter_animate: ^4.5.0
+# isar_plus 自带 ffi 原生库加载，无需单独 isar_plus_flutter_libs（该包在 pub cache
+# 中缺失且无 Windows 原生二进制，会导致桌面构建 symlink 失败）
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # Code generation for Riverpod providers and Isar collections
+  # isar_plus 自带 generator（无需单独 isar_generator / isar_plus_generator）。
+  # 此前尝试原 isar 3.1.0+1 + isar_generator 3.1.0+1 失败：isar_generator 依赖
+  # analyzer ^4.x，无法解析 Dart 3 records 语法，build_runner 卡死。
+  build_runner: ^2.4.13
+  # 图标尺寸测试需要直接断言 SvgPicture 的 width/height
+  flutter_svg: ^2.3.0
+  # Generate Android mipmap + iOS AppIcon assets
+  flutter_launcher_icons: ^0.14.3
+
+# Android launcher icon config: kurashi text logo (white bg, Inter-SemiBold, 1024px).
+# 不用 adaptive icon（避免额外背景层，保持纯文字极简风）。
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
+  remove_alpha_ios: true
+
+# OS 启动屏：mmX 出的 kurashi 文字 logo。无 dark 主题，保持白底。
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/splash/splash.png
+  color_dark: "#FFFFFF"
+  image_dark: assets/splash/splash.png
+  android_12:
+    color: "#FFFFFF"
+    image: assets/splash/splash_android12.png
+    color_dark: "#FFFFFF"
+    image_dark: assets/splash/splash_android12.png
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    - family: JetBrainsMono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/JetBrainsMono-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/JetBrainsMono-SemiBold.ttf
+          weight: 600
+    # 中文 fallback —— Inter 不含 CJK 字符，Noto Sans SC 作为中文 fallback
+    # Regular/Medium/Bold 来自 googlefonts/noto-cjk SubsetOTF（OTF/CFF，.ttf 扩展名）；
+    # SemiBold 在 SubsetOTF 中不存在，由 google/fonts repo 可变字体经 fontTools 实例化 wght=600 得到（TrueType）
+    - family: NotoSansSC
+      fonts:
+        - asset: assets/fonts/NotoSansSC-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSansSC-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansSC-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansSC-Bold.ttf
+          weight: 700
