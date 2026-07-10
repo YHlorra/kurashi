@@ -13,7 +13,7 @@ class FakeAppSettingsRepository implements AppSettingsRepository {
 
   @override
   Stream<AppSettings> watchSettings() {
-    _controller.add(_settings);
+    Future.microtask(() => _controller.add(_settings));
     return _controller.stream;
   }
 

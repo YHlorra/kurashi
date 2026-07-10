@@ -62,21 +62,29 @@ final todaysAgendaProvider = StreamProvider<List<AgendaItem>>((ref) {
   List<TodoItem> todos = const [];
   List<Habit> habits = const [];
   List<Subscription> subs = const [];
+  bool todoReady = false;
+  bool habitReady = false;
+  bool subReady = false;
 
   void emit() {
+    // Wait until all three streams have emitted at least once.
+    if (!todoReady || !habitReady || !subReady) return;
     controller.add(_buildAgenda(todos, habits, subs, today: DateTime.now()));
   }
 
   final s1 = todoRepo.watchAll().listen((v) {
     todos = v;
+    todoReady = true;
     emit();
   });
   final s2 = habitRepo.watchAll().listen((v) {
     habits = v;
+    habitReady = true;
     emit();
   });
   final s3 = subRepo.watchAll().listen((v) {
     subs = v;
+    subReady = true;
     emit();
   });
 
