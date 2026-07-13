@@ -10,6 +10,28 @@ import '../../data/models/subscription.dart';
 import '../../data/models/todo_item.dart';
 import '../lunar/lunar_service.dart';
 
+/// 计算待办提醒的触发时间（纯函数，便于单元测试）。
+///
+/// 返回 null 表示应跳过：无 dueDate / 已完成 / 时间已过期。
+/// 用户设置了具体时间（[TodoItem.dueTimeMinutes]）时按该时间触发；
+/// 否则回退到 dueDate 当天 09:00 的「晨间摘要」行为。
+DateTime? computeTodoReminderTime(TodoItem item, DateTime now) {
+  if (item.dueDate == null || item.completed) return null;
+  final due = item.dueDate!;
+  final minuteOfDay = item.dueTimeMinutes;
+  final scheduled = minuteOfDay != null
+      ? DateTime(
+          due.year,
+          due.month,
+          due.day,
+          minuteOfDay ~/ 60,
+          minuteOfDay % 60,
+        )
+      : DateTime(due.year, due.month, due.day, 9, 0);
+  if (scheduled.isBefore(now)) return null;
+  return scheduled;
+}
+
 /// 通知调度器 —— 封装 flutter_local_notifications。
 ///
 /// 通知 ID 规则：type 前缀 × 1000000 + entity id
@@ -39,19 +61,20 @@ class NotificationScheduler {
   /// 13.2 Todo 截止提醒。
   ///
   /// 仅当 `item.dueDate != null` 且 `!item.completed` 时调度。
-  /// 触发时间：dueDate 当天 09:00（若已过则跳过）。
+  /// 触发时间：若用户设置了具体时间（dueTimeMinutes），按该时间触发；
+  /// 否则回退到 dueDate 当天 09:00 的「晨间摘要」行为。
+  /// 若计算出的时间已过，则跳过（无法提醒过去）。
   /// 通知标题：「待办提醒」，正文：item.title。
   Future<void> scheduleTodoReminder(TodoItem item) async {
     if (!_isMobile) {
       debugPrint('[notify-skip] todo ${item.id} (desktop/web)');
       return;
     }
-    if (item.dueDate == null || item.completed) return;
-
-    final due = item.dueDate!;
-    final now = DateTime.now();
-    final scheduled = DateTime(due.year, due.month, due.day, 9, 0);
-    if (scheduled.isBefore(now)) return; // 已过则跳过
+    final scheduled = computeTodoReminderTime(item, DateTime.now());
+    if (scheduled == null) {
+      debugPrint('[notify-skip] todo ${item.id} (no dueDate / completed / past)');
+      return;
+    }
 
     await _schedule(
       id: _todoPrefix * 1000000 + item.id,
