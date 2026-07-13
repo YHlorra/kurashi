@@ -7,8 +7,8 @@ import 'background_worker.dart';
 
 /// 通知初始化器 —— 阶段 2.3 引入。
 ///
-/// 仅在移动端调用（main.dart 中通过 Platform.isAndroid || Platform.isIOS 判断），
-/// 桌面/Web 跳过，与 `isar_provider` 的平台 fallback 模式一致。
+/// kurashi 仅面向 Android/iOS（项目已移除 web/desktop 目标），
+/// 此处无需平台分支；保留调用以兼容未来扩展。
 ///
 /// 职责：
 /// 1. 初始化 flutter_local_notifications（Android 用 ic_launcher，iOS 暂不请求权限）。

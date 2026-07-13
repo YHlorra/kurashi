@@ -16,8 +16,8 @@ import '../lunar/lunar_service.dart';
 ///   Todo: 1xxx,xxx | Habit: 2xxx,xxx | Subscription: 3xxx,xxx | Fridge: 4xxx,xxx
 ///   Fridge 前 3 天通知额外加 [_fridgeAdvanceOffset]（100000）偏移区分。
 ///
-/// 平台 fallback：桌面/Web 平台调度静默 no-op（仅 print log），移动端真正调用。
-/// 与 isar_provider / notification_initializer 的 fallback 模式一致。
+/// 调度仅面向 Android/iOS（项目已移除 web/desktop 目标）。
+/// `_isMobile` 守卫为防御性判断，在移动端恒为 true；保留以兼容潜在扩展。
 ///
 /// 依赖 [NotificationInitializer.initialize] 中完成的 timezone 初始化
 /// （tz_data.initializeTimeZones + setLocalLocation('Asia/Shanghai')）。
@@ -31,7 +31,7 @@ class NotificationScheduler {
   static const _fridgePrefix = 4;
   static const _fridgeAdvanceOffset = 100000; // 前 3 天通知 ID 偏移
 
-  /// 仅 Android/iOS 真正调度，桌面/Web 静默跳过。
+  /// 仅 Android/iOS 真正调度；`_isMobile` 在移动端恒为 true（防御性守卫）。
   bool get _isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
   // ── 4 类 schedule 方法 ─────────────────────────────────────────────────

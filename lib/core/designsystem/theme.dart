@@ -5,7 +5,7 @@ import 'colors.dart';
 /// 设计图原稿：Helvetica Neue（正文）+ SF Mono（等宽，用于计数/日期/周数）
 /// 实际 bundle：Inter（Helvetica 开源近替，仅 Latin）+ JetBrains Mono（SF Mono 开源近替）
 ///           + Noto Sans SC（Inter 不含 CJK 字符时作为中文 fallback）
-/// 字体文件随 app 打包，三端（Android/iOS/Windows 预览）渲染一致；fallback 仅为兜底
+/// 字体文件随 app 打包，Android/iOS 两端渲染一致；fallback 仅为兜底
 class AppFonts {
   AppFonts._();
 
