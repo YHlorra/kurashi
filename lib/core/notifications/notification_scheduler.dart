@@ -232,15 +232,56 @@ class NotificationScheduler {
     );
 
     final tzScheduled = tz.TZDateTime.from(scheduled, tz.local);
+    final mode = await _resolveAndroidScheduleMode();
     await _plugin.zonedSchedule(
       id: id,
       title: title,
       body: body,
       scheduledDate: tzScheduled,
       notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: mode,
       matchDateTimeComponents: repeatDaily ? DateTimeComponents.time : null,
     );
+  }
+
+  /// 决定 Android 精确闹钟调度模式（精确闹钟守卫）。
+  ///
+  /// 背景：Android 12+ (API 31+) 用 exactAllowWhileIdle 需要用户授予
+  /// SCHEDULE_EXACT_ALARM；若未授权，zonedSchedule(exact) 会抛异常 / 静默不响，
+  /// 导致所有提醒失效（vivo Android 16 直接命中）。
+  ///
+  /// 策略：
+  /// - 非 Android（iOS）：exactAllowWhileIdle（iOS 无此权限概念，插件忽略模式差异）。
+  /// - Android 且已授权：exactAllowWhileIdle（跨 Doze/待机持久，体验最佳）。
+  /// - Android 但未授权：降级 alarmClock——仍按精确时间触发（状态栏显示闹钟图标），
+  ///   且不需要 SCHEDULE_EXACT_ALARM 权限，保证「不崩 + 提醒照响」。
+  Future<AndroidScheduleMode> _resolveAndroidScheduleMode() async {
+    if (!Platform.isAndroid) return AndroidScheduleMode.exactAllowWhileIdle;
+    final androidPlugin = _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin == null) return AndroidScheduleMode.exactAllowWhileIdle;
+    final canExact = await androidPlugin.canScheduleExactNotifications() ?? false;
+    return canExact
+        ? AndroidScheduleMode.exactAllowWhileIdle
+        : AndroidScheduleMode.alarmClock;
+  }
+
+  /// 引导用户授予精确闹钟权限（请求系统权限，Android 12+ 会引导至设置页）。
+  ///
+  /// 当 [canScheduleExactNotifications] 返回 false 时调用，配合
+  /// [_resolveAndroidScheduleMode] 的 alarmClock 降级，让用户在需要时升级为
+  /// 跨 Doze 的精确提醒。
+  /// 不自动在启动时调用（避免打扰），应由设置页 / 首次开启提醒的 UI 入口触发。
+  Future<void> requestExactAlarmPermission() async {
+    if (!Platform.isAndroid) return;
+    final androidPlugin = _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin == null) return;
+    if ((await androidPlugin.canScheduleExactNotifications()) != true) {
+      await androidPlugin.requestExactAlarmsPermission();
+    }
   }
 }
 
