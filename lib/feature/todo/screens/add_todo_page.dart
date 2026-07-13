@@ -167,7 +167,7 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
           createdAt: DateTime.now(),
         );
         final id = await ref.read(todoRepositoryProvider).addTodo(item);
-        if (_dueDate != null && _enableReminder && _reminderTime != null) {
+        if (_dueDate != null) {
           unawaited(
             notificationScheduler
                 .scheduleTodoReminder(item.copyWith(id: id))
@@ -353,32 +353,6 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
                     ),
                 ],
               ),
-              const SizedBox(height: 20),
-              // 提醒时间
-              Row(
-                children: [
-                  Checkbox(
-                    value: _enableReminder,
-                    onChanged: (v) =>
-                        setState(() => _enableReminder = v ?? false),
-                  ),
-                  const Text('无提醒', style: TextStyle(fontSize: 14)),
-                  const Spacer(),
-                  if (_enableReminder && _reminderTime != null)
-                    Text(
-                      '${_reminderTime!.hour.toString().padLeft(2, '0')}:${_reminderTime!.minute.toString().padLeft(2, '0')}',
-                      style: const TextStyle(fontSize: 14, color: AppColors.fg),
-                    ),
-                  if (_enableReminder)
-                    TextButton(
-                      onPressed: _pickTime,
-                      child: const Text(
-                        '选择时间',
-                        style: TextStyle(fontSize: 14, color: AppColors.muted),
-                      ),
-                    ),
-                ],
-              ),
             ] else ...[
               const _SectionLabel(label: '频率（每周）'),
               const SizedBox(height: 8),
@@ -404,7 +378,7 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
                     onChanged: (v) =>
                         setState(() => _enableReminder = v ?? false),
                   ),
-                  const Text('无提醒', style: TextStyle(fontSize: 14)),
+                  const Text('提醒', style: TextStyle(fontSize: 14)),
                   const Spacer(),
                   if (_enableReminder && _reminderTime != null)
                     Text(
