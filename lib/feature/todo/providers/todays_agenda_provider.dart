@@ -159,13 +159,14 @@ List<AgendaItem> _buildAgenda(
     if (d < 0 || d > 365) continue;
     anchorSubs.add(s);
   }
-  anchorSubs.sort((a, b) =>
-      lunarService.daysUntil(a, today: now)
-          .compareTo(lunarService.daysUntil(b, today: now)));
+  anchorSubs.sort(
+    (a, b) => lunarService
+        .daysUntil(a, today: now)
+        .compareTo(lunarService.daysUntil(b, today: now)),
+  );
   for (final s in anchorSubs) {
     result.add(SubAgendaItem(s));
   }
 
   return result;
 }
-

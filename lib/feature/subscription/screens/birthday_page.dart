@@ -75,7 +75,8 @@ class _BirthdayPageState extends ConsumerState<BirthdayPage> {
 
   @override
   Widget build(BuildContext context) {
-    final canSubmit = _nameController.text.trim().isNotEmpty && _selectedDate != null;
+    final canSubmit =
+        _nameController.text.trim().isNotEmpty && _selectedDate != null;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -112,7 +113,10 @@ class _BirthdayPageState extends ConsumerState<BirthdayPage> {
                   Expanded(
                     child: Text(
                       _formatDate(_selectedDate!),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   GestureDetector(
@@ -161,7 +165,11 @@ class _BirthdayPageState extends ConsumerState<BirthdayPage> {
               children: [
                 const Text(
                   '按农历',
-                  style: TextStyle(fontSize: 12, color: AppColors.muted, letterSpacing: 0.48),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.muted,
+                    letterSpacing: 0.48,
+                  ),
                 ),
                 const Spacer(),
                 Switch(
@@ -185,7 +193,14 @@ class _BirthdayPageState extends ConsumerState<BirthdayPage> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                for (final entry in const [(0, '当天'), (1, '1 天'), (3, '3 天'), (7, '7 天'), (14, '14 天'), (30, '30 天')])
+                for (final entry in const [
+                  (0, '当天'),
+                  (1, '1 天'),
+                  (3, '3 天'),
+                  (7, '7 天'),
+                  (14, '14 天'),
+                  (30, '30 天'),
+                ])
                   PresetChip(
                     label: entry.$2,
                     isSelected: _leadDays == entry.$1,
@@ -201,7 +216,10 @@ class _BirthdayPageState extends ConsumerState<BirthdayPage> {
           ],
         ),
       ),
-      bottomNavigationBar: FormBottomBar(onAction: _submit, actionEnabled: canSubmit),
+      bottomNavigationBar: FormBottomBar(
+        onAction: _submit,
+        actionEnabled: canSubmit,
+      ),
     );
   }
 }
@@ -216,7 +234,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(fontSize: 12, color: AppColors.muted, letterSpacing: 0.48),
+      style: const TextStyle(
+        fontSize: 12,
+        color: AppColors.muted,
+        letterSpacing: 0.48,
+      ),
     );
   }
 }
@@ -231,7 +253,7 @@ class _ErrorBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFC53030).withValues(alpha: 0.06),
+        color: AppColors.dangerSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

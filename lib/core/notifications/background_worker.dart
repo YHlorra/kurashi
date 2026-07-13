@@ -69,7 +69,9 @@ Future<void> _rescheduleAll(Isar isar) async {
   // Todo：未完成且 dueDate 在 7 天内
   final todos = isar.todoItems.where().findAll();
   for (final t in todos) {
-    if (!t.completed && t.dueDate != null && t.dueDate!.isBefore(sevenDaysLater)) {
+    if (!t.completed &&
+        t.dueDate != null &&
+        t.dueDate!.isBefore(sevenDaysLater)) {
       await notificationScheduler.scheduleTodoReminder(t);
     }
   }
@@ -109,22 +111,18 @@ Future<void> _rescheduleAll(Isar isar) async {
 Future<Isar> _openIsarForBackground() async {
   final dir = await getApplicationDocumentsDirectory();
   try {
-    return Isar.open(
-      schemas: schemas,
-      directory: dir.path,
-      inspector: false,
-    );
+    return Isar.open(schemas: schemas, directory: dir.path, inspector: false);
   } catch (e) {
     final dbName = 'default.isar';
     final dbFile = File('${dir.path}/$dbName');
     final lockFile = File('${dir.path}/$dbName.lock');
-    try { if (dbFile.existsSync()) dbFile.deleteSync(); } catch (_) {}
-    try { if (lockFile.existsSync()) lockFile.deleteSync(); } catch (_) {}
-    return Isar.open(
-      schemas: schemas,
-      directory: dir.path,
-      inspector: false,
-    );
+    try {
+      if (dbFile.existsSync()) dbFile.deleteSync();
+    } catch (_) {}
+    try {
+      if (lockFile.existsSync()) lockFile.deleteSync();
+    } catch (_) {}
+    return Isar.open(schemas: schemas, directory: dir.path, inspector: false);
   }
 }
 

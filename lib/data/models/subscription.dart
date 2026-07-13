@@ -47,7 +47,8 @@ class Subscription {
   final int? intervalDays;
   final int leadDays;
   final bool active;
-  final bool isPack;  // true=one-time pack (festivals), false=multi-instance (birthday/pet/doc/...)
+  final bool
+  isPack; // true=one-time pack (festivals), false=multi-instance (birthday/pet/doc/...)
   final DateTime createdAt;
 
   const Subscription({

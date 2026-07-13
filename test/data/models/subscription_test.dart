@@ -4,10 +4,17 @@ import 'package:kurashi/data/models/subscription.dart';
 void main() {
   group('Subscription model', () {
     final base = Subscription(
-      id: 1, title: 'Spring Festival', type: SubType.cnFestival,
-      calendar: Calendar.lunar, mode: TriggerMode.anchorMonthly,
-      anchorMonth: 1, anchorDay: 1, leadDays: 0, active: false,
-      isPack: true, createdAt: DateTime(2026, 7, 1),
+      id: 1,
+      title: 'Spring Festival',
+      type: SubType.cnFestival,
+      calendar: Calendar.lunar,
+      mode: TriggerMode.anchorMonthly,
+      anchorMonth: 1,
+      anchorDay: 1,
+      leadDays: 0,
+      active: false,
+      isPack: true,
+      createdAt: DateTime(2026, 7, 1),
     );
 
     test('copyWith preserves unchanged fields', () {
@@ -24,10 +31,17 @@ void main() {
 
     test('equality: same fields equal', () {
       final b = Subscription(
-        id: 1, title: 'Spring Festival', type: SubType.cnFestival,
-        calendar: Calendar.lunar, mode: TriggerMode.anchorMonthly,
-        anchorMonth: 1, anchorDay: 1, leadDays: 0, active: false,
-        isPack: true, createdAt: DateTime(2026, 7, 1),
+        id: 1,
+        title: 'Spring Festival',
+        type: SubType.cnFestival,
+        calendar: Calendar.lunar,
+        mode: TriggerMode.anchorMonthly,
+        anchorMonth: 1,
+        anchorDay: 1,
+        leadDays: 0,
+        active: false,
+        isPack: true,
+        createdAt: DateTime(2026, 7, 1),
       );
       expect(base, b);
       expect(base.hashCode, b.hashCode);
@@ -39,6 +53,9 @@ void main() {
 
     test('all SubType values exist', () => expect(SubType.values.length, 10));
     test('all Calendar values exist', () => expect(Calendar.values.length, 2));
-    test('all TriggerMode values exist', () => expect(TriggerMode.values.length, 2));
+    test(
+      'all TriggerMode values exist',
+      () => expect(TriggerMode.values.length, 2),
+    );
   });
 }

@@ -16,7 +16,6 @@ import '../../todo/widgets/sub_anchor_tile.dart';
 import '../../todo/widgets/todo_item_tile.dart';
 import 'add_todo_page.dart';
 
-/// Todo tab 主界面 —— 对照 mobile-android-todo.html
 class TodoScreen extends ConsumerStatefulWidget {
   const TodoScreen({super.key});
 
@@ -80,7 +79,7 @@ class _TodoScreenState extends ConsumerState<TodoScreen> {
           // 按 chip 筛选
           final filtered = _filterByChip(items, _activeChip);
 
-if (filtered.isEmpty) {
+          if (filtered.isEmpty) {
             return Column(
               children: [
                 _ChipsRow(
@@ -143,10 +142,7 @@ if (filtered.isEmpty) {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text(
-            '$e',
-            style: const TextStyle(color: AppColors.danger),
-          ),
+          child: Text('$e', style: const TextStyle(color: AppColors.danger)),
         ),
       ),
       floatingActionButton: _FAB(onPressed: _showAddPage),
@@ -157,19 +153,16 @@ if (filtered.isEmpty) {
   Widget _buildTile(AgendaItem item, DateTime today, DateTime weekStart) {
     return switch (item) {
       TodoAgendaItem(:final item) => TodoItemTile(
-          item: item,
-          today: today,
-          onToggle: () => toggleTodoWithNotifications(ref, item),
-        ),
+        item: item,
+        today: today,
+        onToggle: () => toggleTodoWithNotifications(ref, item),
+      ),
       HabitAgendaItem(:final habit) => HabitTile(
-          habit: habit,
-          today: today,
-          weekStart: weekStart,
-        ),
-      SubAgendaItem(:final sub) => SubAnchorTile(
-          sub: sub,
-          today: today,
-        ),
+        habit: habit,
+        today: today,
+        weekStart: weekStart,
+      ),
+      SubAgendaItem(:final sub) => SubAnchorTile(sub: sub, today: today),
     };
   }
 
@@ -193,7 +186,10 @@ if (filtered.isEmpty) {
       // todo: dueDate · habit: 无（每日）· sub: 下次触发日
       final dueDate = switch (ai) {
         TodoAgendaItem(:final item) => item.dueDate,
-        SubAgendaItem(:final sub) => lunarService.nextTriggerDate(sub, today: now),
+        SubAgendaItem(:final sub) => lunarService.nextTriggerDate(
+          sub,
+          today: now,
+        ),
         HabitAgendaItem() => null,
       };
 
@@ -287,8 +283,6 @@ class _ChipsRow extends StatelessWidget {
   }
 }
 
-/// 单个 chip —— 高36 padding0x16 圆角999 1px border 14px w500
-/// active：黑底白字 border fg；未激活：白底 fg 字 border border
 class _Chip extends StatelessWidget {
   final String label;
   final int count;
@@ -333,9 +327,7 @@ class _Chip extends StatelessWidget {
               '$count',
               style: TextStyle(
                 fontSize: 12,
-                color: isActive
-                    ? const Color(0x99FFFFFF) // rgba(255,255,255,0.6)
-                    : AppColors.muted,
+                color: isActive ? AppColors.white60 : AppColors.muted,
               ),
             ),
           ],
@@ -345,7 +337,7 @@ class _Chip extends StatelessWidget {
   }
 }
 
-/// 日期分组 header —— 左：大号粗体日期标签；右（仅今天）：浅粉背景的「周X · 阴历X月X」标签
+/// 日期分组 header
 class _DateHeader extends StatelessWidget {
   final DateTime date;
   final DateTime today;
@@ -382,7 +374,7 @@ class _DateHeader extends StatelessWidget {
   }
 }
 
-/// 今日右侧「周X · 阴历X月X」胶囊标签 —— 浅粉底，暗红字
+/// 今日右侧「周X · 阴历X月X」
 class _TodayLunarBadge extends StatelessWidget {
   final DateTime today;
   const _TodayLunarBadge({required this.today});
@@ -396,7 +388,7 @@ class _TodayLunarBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDE2E2),
+        color: AppColors.dangerSoft,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
@@ -404,7 +396,7 @@ class _TodayLunarBadge extends StatelessWidget {
         style: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: Color(0xFFB54141),
+          color: AppColors.dangerBg,
           letterSpacing: 0.26, // 0.02em × 13
         ),
       ),
@@ -412,8 +404,7 @@ class _TodayLunarBadge extends StatelessWidget {
   }
 }
 
-/// FAB —— 56x56 圆形 黑底白字 + 号，阴影 0 4px 12px rgba(0,0,0,0.2)
-/// 与冰箱 tab FAB 统一视觉：圆形 + 纯 + 号。
+/// FAB —— 56x56 圆形 黑底白字 + 号
 class _FAB extends StatelessWidget {
   final VoidCallback onPressed;
   const _FAB({required this.onPressed});
@@ -425,7 +416,7 @@ class _FAB extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Color(0x33000000), // rgba(0,0,0,0.2)
+            color: AppColors.shadowStrong,
             blurRadius: 12,
             offset: Offset(0, 4),
           ),
@@ -448,7 +439,6 @@ class _FAB extends StatelessWidget {
   }
 }
 
-/// 按 type 统计计数
 Map<String, int> _countByType(List<AgendaItem> items) {
   int todo = 0, habit = 0, sub = 0;
   for (final item in items) {
@@ -461,15 +451,9 @@ Map<String, int> _countByType(List<AgendaItem> items) {
         sub++;
     }
   }
-  return {
-    'all': todo + habit + sub,
-    'todo': todo,
-    'habit': habit,
-    'sub': sub,
-  };
+  return {'all': todo + habit + sub, 'todo': todo, 'habit': habit, 'sub': sub};
 }
 
-/// 按 chip 筛选
 List<AgendaItem> _filterByChip(List<AgendaItem> items, String chip) {
   if (chip == 'all') return items;
   return items.where((item) {
@@ -484,11 +468,6 @@ List<AgendaItem> _filterByChip(List<AgendaItem> items, String chip) {
   }).toList();
 }
 
-/// 日期分组标签 —— 4 档：
-/// - 今天                       → "今天"
-/// - 本周（周一至周日）内其他日  → "周X"
-/// - 下周（本周之后的周一至周日）→ "X月X日，下周X"
-/// - 跨周以外                   → "X月X日"
 String _dateLabel(DateTime date, DateTime today) {
   final d = DateTime(date.year, date.month, date.day);
   final t = DateTime(today.year, today.month, today.day);
@@ -524,34 +503,28 @@ DateTime _weekStart(DateTime date) {
   return d.subtract(Duration(days: d.weekday - 1));
 }
 
-/// 切换 todo 完成态 + 联动通知调度（fire-and-forget，失败仅 log）。
-///
-/// 由 agenda 主视图和「已完成」视图共享 —— 阶段 2 后 todo 可在两处 tap 切换，
-/// reopen 时必须重新调度提醒，否则过期通知静默丢失（per oracle Phase 2 MEDIUM-2）。
 void toggleTodoWithNotifications(WidgetRef ref, TodoItem item) {
   ref.read(todoRepositoryProvider).toggleComplete(item.id);
   final willComplete = !item.completed;
   if (willComplete) {
-    unawaited(notificationScheduler
-        .cancelTodo(item.id)
-        .catchError((Object e) => debugPrint('[notify-error] todo cancel: $e')));
+    unawaited(
+      notificationScheduler
+          .cancelTodo(item.id)
+          .catchError(
+            (Object e) => debugPrint('[notify-error] todo cancel: $e'),
+          ),
+    );
   } else if (item.dueDate != null) {
-    unawaited(notificationScheduler
-        .scheduleTodoReminder(item.copyWith(completed: false))
-        .catchError((Object e) =>
-            debugPrint('[notify-error] todo schedule: $e')));
+    unawaited(
+      notificationScheduler
+          .scheduleTodoReminder(item.copyWith(completed: false))
+          .catchError(
+            (Object e) => debugPrint('[notify-error] todo schedule: $e'),
+          ),
+    );
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// 「已完成」视图 —— 阶段 2 新增
-// ════════════════════════════════════════════════════════════════════════════
-
-/// 已完成 todo 列表视图 —— 由 _TodoScreenState.build() 的早返回分支触发。
-///
-/// 设计：仿 iOS Reminders "Completed" 视图，按完成日期倒序分组，
-/// null completedAt 归入「未知日期」桶放底部（per oracle FINDING 8）。
-/// 点击 tile = reopen（toggleComplete back to false），自动回到今日视图。
 class _CompletedTodosView extends ConsumerWidget {
   final VoidCallback onBack;
 
@@ -634,10 +607,7 @@ class _CompletedTodosView extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
-          child: Text(
-            '$e',
-            style: const TextStyle(color: AppColors.danger),
-          ),
+          child: Text('$e', style: const TextStyle(color: AppColors.danger)),
         ),
       ),
     );
@@ -661,10 +631,12 @@ class _CompletedTodosView extends ConsumerWidget {
     final sortedDates = map.keys.toList()..sort((a, b) => b.compareTo(a));
     final groups = <_CompletedGroup>[];
     for (final d in sortedDates) {
-      groups.add(_CompletedGroup(
-        label: _completedDateLabel(d, DateTime.now()),
-        items: map[d]!,
-      ));
+      groups.add(
+        _CompletedGroup(
+          label: _completedDateLabel(d, DateTime.now()),
+          items: map[d]!,
+        ),
+      );
     }
     if (nullBucket.isNotEmpty) {
       groups.add(_CompletedGroup(label: '未知日期', items: nullBucket));
@@ -679,10 +651,6 @@ class _CompletedGroup {
   const _CompletedGroup({required this.label, required this.items});
 }
 
-/// 完成日期分组标签 —— 4 档：
-/// - 今天               → "今天"
-/// - 本周其他日          → "周X"
-/// - 跨周以外           → "X月X日"
 String _completedDateLabel(DateTime date, DateTime today) {
   final d = DateTime(date.year, date.month, date.day);
   final t = DateTime(today.year, today.month, today.day);
@@ -697,4 +665,3 @@ String _completedDateLabel(DateTime date, DateTime today) {
   }
   return '${d.month}月${d.day}日';
 }
-

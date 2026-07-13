@@ -27,7 +27,10 @@ void main() {
 
     tearDownAll(() {
       _isar?.close();
-      try { if (_isar != null) Directory('${_isar!.directory}').deleteSync(recursive: true); } catch (_) {}
+      try {
+        if (_isar != null)
+          Directory('${_isar!.directory}').deleteSync(recursive: true);
+      } catch (_) {}
     });
 
     setUp(() {
@@ -36,33 +39,43 @@ void main() {
         container = null;
         return;
       }
-      container = ProviderContainer(overrides: [
-        todoRepositoryProvider.overrideWithValue(IsarTodoRepository(isar)),
-        habitRepositoryProvider.overrideWithValue(IsarHabitRepository(isar)),
-        subscriptionRepositoryProvider.overrideWithValue(IsarSubscriptionRepository(isar)),
-      ]);
+      container = ProviderContainer(
+        overrides: [
+          todoRepositoryProvider.overrideWithValue(IsarTodoRepository(isar)),
+          habitRepositoryProvider.overrideWithValue(IsarHabitRepository(isar)),
+          subscriptionRepositoryProvider.overrideWithValue(
+            IsarSubscriptionRepository(isar),
+          ),
+        ],
+      );
     });
 
     tearDown(() => container?.dispose());
 
     test('用户打开今日视图 → 收到聚合事项列表', () async {
-      if (_isar == null || container == null) return markTestSkipped('Isar 原生库不可用');
+      if (_isar == null || container == null)
+        return markTestSkipped('Isar 原生库不可用');
       final agenda = await container!.read(todaysAgendaProvider.future);
       expect(agenda, isA<List<AgendaItem>>());
       expect(agenda, isNotEmpty);
     });
 
     test('今日事项包含待办和习惯', () async {
-      if (_isar == null || container == null) return markTestSkipped('Isar 原生库不可用');
+      if (_isar == null || container == null)
+        return markTestSkipped('Isar 原生库不可用');
       final agenda = await container!.read(todaysAgendaProvider.future);
       expect(agenda.whereType<TodoAgendaItem>(), isNotEmpty);
       expect(agenda.whereType<HabitAgendaItem>(), isNotEmpty);
     });
 
     test('已完成待办不出现在今日事项中', () async {
-      if (_isar == null || container == null) return markTestSkipped('Isar 原生库不可用');
+      if (_isar == null || container == null)
+        return markTestSkipped('Isar 原生库不可用');
       final agenda = await container!.read(todaysAgendaProvider.future);
-      final completedTodos = agenda.whereType<TodoAgendaItem>().where((t) => t.item.completed).toList();
+      final completedTodos = agenda
+          .whereType<TodoAgendaItem>()
+          .where((t) => t.item.completed)
+          .toList();
       expect(completedTodos, isEmpty);
     });
   });

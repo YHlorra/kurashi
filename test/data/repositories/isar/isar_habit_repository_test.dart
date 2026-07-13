@@ -19,7 +19,10 @@ void main() {
   });
   tearDownAll(() {
     isar?.close();
-    try { if (isar != null) Directory('${isar!.directory}').deleteSync(recursive: true); } catch (_) {}
+    try {
+      if (isar != null)
+        Directory('${isar!.directory}').deleteSync(recursive: true);
+    } catch (_) {}
   });
 
   group('HabitRepository — 用户行为', () {
@@ -27,7 +30,13 @@ void main() {
       if (isar == null) return markTestSkipped('Isar 原生库不可用');
       final repo = IsarHabitRepository(isar!);
       final before = await repo.watchAll().first;
-      await repo.addHabit(Habit(title: 'Meditate', frequencyPerWeek: 7, createdAt: DateTime.now()));
+      await repo.addHabit(
+        Habit(
+          title: 'Meditate',
+          frequencyPerWeek: 7,
+          createdAt: DateTime.now(),
+        ),
+      );
       final after = await repo.watchAll().first;
       expect(after.length, before.length + 1);
     });
@@ -48,7 +57,9 @@ void main() {
       final habits = await repo.watchAll().first;
       final id = habits.first.id;
       await repo.checkin(id, DateTime(2026, 8, 3));
-      final checkins = await repo.watchCheckinsFor(id, DateTime(2026, 8, 1)).first;
+      final checkins = await repo
+          .watchCheckinsFor(id, DateTime(2026, 8, 1))
+          .first;
       expect(checkins.any((c) => c.date.day == 3), isTrue);
     });
 
@@ -59,7 +70,9 @@ void main() {
       final id = habits.first.id;
       await repo.checkin(id, DateTime(2026, 8, 4));
       await repo.checkin(id, DateTime(2026, 8, 4));
-      final checkins = await repo.watchCheckinsFor(id, DateTime(2026, 8, 1)).first;
+      final checkins = await repo
+          .watchCheckinsFor(id, DateTime(2026, 8, 1))
+          .first;
       expect(checkins.where((c) => c.date.day == 4).length, 1);
     });
 
@@ -70,7 +83,9 @@ void main() {
       final id = habits.first.id;
       await repo.checkin(id, DateTime(2026, 8, 5));
       await repo.uncheckin(id, DateTime(2026, 8, 5));
-      final checkins = await repo.watchCheckinsFor(id, DateTime(2026, 8, 1)).first;
+      final checkins = await repo
+          .watchCheckinsFor(id, DateTime(2026, 8, 1))
+          .first;
       expect(checkins.any((c) => c.date.day == 5), isFalse);
     });
   });

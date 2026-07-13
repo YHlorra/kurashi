@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -8,13 +7,10 @@ import '../../../core/designsystem/colors.dart';
 import '../../../data/repositories/fridge_repository.dart';
 import '../../../data/repositories/providers.dart';
 
-/// 购物清单 —— 小票视觉（A-refined 设计稿）
+/// 购物清单 —— 小票视觉
 ///
-/// 设计：`docs/designs/2026-07-09/receipt-shopping-list-A-refined.html`
-/// - 数据：`FridgeRepository.getRestockCandidates()` 按 name 聚合
-/// - 视觉：暖米白纸 + 撕边虚线 + mono 字体 + 黑色印章
-/// - 动效：flutter_animate 逐项 fadeIn + slideY（250ms interval）
-/// - 分享：share_plus 系统分享纯文本
+/// 数据来源：`FridgeRepository.getRestockCandidates()` 按 name 聚合
+/// 视觉：暖米白纸 + 撕边虚线 + mono 字体 + 黑色印章
 class ShoppingListScreen extends ConsumerWidget {
   const ShoppingListScreen({super.key});
 
@@ -69,7 +65,10 @@ class ShoppingListScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _share(BuildContext context, List<RestockCandidate> candidates) async {
+  Future<void> _share(
+    BuildContext context,
+    List<RestockCandidate> candidates,
+  ) async {
     final buf = StringBuffer()
       ..writeln('kurashi · 购物清单')
       ..writeln('——————')
@@ -87,7 +86,10 @@ class ShoppingListScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('分享失败：$e'), duration: const Duration(seconds: 2)),
+          SnackBar(
+            content: Text('分享失败：$e'),
+            duration: const Duration(seconds: 2),
+          ),
         );
       }
     }
@@ -100,10 +102,11 @@ class ShoppingListScreen extends ConsumerWidget {
 }
 
 /// 局部 FutureProvider —— 跟随 fridgeRepositoryProvider 实例，自动跟随 widget 树释放。
-final _restockCandidatesProvider = FutureProvider.autoDispose<List<RestockCandidate>>((ref) async {
-  final repo = ref.watch(fridgeRepositoryProvider);
-  return repo.getRestockCandidates();
-});
+final _restockCandidatesProvider =
+    FutureProvider.autoDispose<List<RestockCandidate>>((ref) async {
+      final repo = ref.watch(fridgeRepositoryProvider);
+      return repo.getRestockCandidates();
+    });
 
 /// 空状态 —— 无任何补货候选时
 class _EmptyState extends StatelessWidget {
@@ -123,11 +126,7 @@ class _EmptyState extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
-            child: Icon(
-              Icons.receipt_long,
-              size: 24,
-              color: AppColors.muted,
-            ),
+            child: Icon(Icons.receipt_long, size: 24, color: AppColors.muted),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -145,51 +144,80 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-/// 小票视图 —— A-refined 视觉
-class _ReceiptView extends StatelessWidget {
+/// 小票视图
+class _ReceiptView extends StatefulWidget {
   final List<RestockCandidate> candidates;
 
   const _ReceiptView({required this.candidates});
 
+  @override
+  State<_ReceiptView> createState() => _ReceiptViewState();
+}
+
+class _ReceiptViewState extends State<_ReceiptView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
   // 小票纸面配色 —— 与 AppColors 主色板不同，仅此屏使用
   static const _paperTop = Color(0xFFFFF8E7);
   static const _paperBottom = Color(0xFFFBF1D8);
-  static const _ink = Color(0xFF17130C); // 深棕黑，比 AppColors.fg 略暖
+  static const _ink = Color(0xFF17130C);
   static const _inkSoft = Color(0xFF4B412F);
   static const _serialMuted = Color(0xFF6D6045);
 
   @override
+  void initState() {
+    super.initState();
+    final durationMs = widget.candidates.length * 120 + 320;
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: durationMs),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final candidates = widget.candidates;
     final generatedAt = _nowStr();
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       child: Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [_paperTop, _paperBottom],
           ),
           borderRadius: BorderRadius.circular(4),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0x14000000),
+              color: AppColors.shadow,
               blurRadius: 18,
-              offset: Offset(0, 8),
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 撕边虚线 —— 顶部
-            const _TearEdge(color: _ink, dashWidth: 8, dashGap: 4, thickness: 2),
+            const _TearEdge(
+              color: _ink,
+              dashWidth: 8,
+              dashGap: 4,
+              thickness: 2,
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Kicker —— 小字大写品牌
+                  // Kicker
                   const Text(
                     'KURASHI PANTRY',
                     textAlign: TextAlign.center,
@@ -202,7 +230,7 @@ class _ReceiptView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  // 标题 —— 居中加粗 + 下划线
+                  // 标题
                   const Text(
                     '购物清单',
                     textAlign: TextAlign.center,
@@ -217,7 +245,7 @@ class _ReceiptView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Sub —— 编号
+                  // 编号
                   Text(
                     'FRIDGE RESTOCK RECEIPT\nNO. ${_serialNo()}',
                     textAlign: TextAlign.center,
@@ -231,22 +259,19 @@ class _ReceiptView extends StatelessWidget {
                   const SizedBox(height: 14),
                   const _Rule(thickness: 2, color: _ink),
                   const SizedBox(height: 8),
-                  // 商品列表 —— 逐项 fadeIn + slideY
+                  // 商品列表
                   for (int i = 0; i < candidates.length; i++)
-                    _ReceiptRow(candidate: candidates[i])
-                        .animate()
-                        .fadeIn(
-                          delay: (i * 120).ms,
-                          duration: 320.ms,
-                        )
-                        .slideY(begin: 0.08, end: 0, curve: Curves.easeOut),
+                    _ReceiptRow(
+                      candidate: candidates[i],
+                      animation: _controller,
+                      intervalStart:
+                          (i * 120) / (candidates.length * 120 + 320),
+                    ),
                   const SizedBox(height: 10),
                   const _Rule(thickness: 1, color: _ink),
                   const SizedBox(height: 14),
-                  // 总计块
                   _TotalBlock(candidates: candidates),
                   const SizedBox(height: 16),
-                  // 时间戳
                   Text(
                     '生成时间 $generatedAt\n本清单来自 kurashi 冰箱',
                     textAlign: TextAlign.center,
@@ -258,7 +283,6 @@ class _ReceiptView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // 结尾印章
                   const Text(
                     '—— 完 ——',
                     textAlign: TextAlign.center,
@@ -271,7 +295,6 @@ class _ReceiptView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // 序列号 footer
                   const Text(
                     'THANK YOU / BUY ONLY WHAT YOU NEED',
                     textAlign: TextAlign.center,
@@ -285,8 +308,12 @@ class _ReceiptView extends StatelessWidget {
                 ],
               ),
             ),
-            // 撕边虚线 —— 底部
-            const _TearEdge(color: _ink, dashWidth: 8, dashGap: 4, thickness: 2),
+            const _TearEdge(
+              color: _ink,
+              dashWidth: 8,
+              dashGap: 4,
+              thickness: 2,
+            ),
           ],
         ),
       ),
@@ -309,70 +336,86 @@ class _ReceiptView extends StatelessWidget {
 /// 小票单行 —— name + qty × + 「需补货」印章
 class _ReceiptRow extends StatelessWidget {
   final RestockCandidate candidate;
+  final AnimationController animation;
+  final double intervalStart;
 
-  const _ReceiptRow({required this.candidate});
+  const _ReceiptRow({
+    required this.candidate,
+    required this.animation,
+    required this.intervalStart,
+  });
 
-  // 与外层 _ReceiptView 一致
   static const _ink = Color(0xFF17130C);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: _ink, width: 1),
+    final interval = Interval(
+      intervalStart,
+      intervalStart + 320 / (animation.duration!.inMilliseconds),
+      curve: Curves.easeOut,
+    );
+    final curved = CurvedAnimation(parent: animation, curve: interval);
+
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.08),
+          end: Offset.zero,
+        ).animate(curved),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: _ink, width: 1)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Text(
+                  candidate.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: _ink,
+                    fontFamily: 'JetBrainsMono',
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '× ${candidate.restockQty}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: _ink,
+                  fontFamily: 'JetBrainsMono',
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: _ink,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: const Text(
+                  '需补货',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.0,
+                    color: _ReceiptViewState._paperTop,
+                    fontFamily: 'JetBrainsMono',
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
-        children: [
-          // name —— 16px mono bold
-          Expanded(
-            child: Text(
-              candidate.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
-                color: _ink,
-                fontFamily: 'JetBrainsMono',
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-          const SizedBox(width: 12),
-          // qty
-          Text(
-            '× ${candidate.restockQty}',
-            style: const TextStyle(
-              fontSize: 13,
-              color: _ink,
-              fontFamily: 'JetBrainsMono',
-            ),
-          ),
-          const SizedBox(width: 8),
-          // tag —— 黑底白字「需补货」
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: BoxDecoration(
-              color: _ink,
-              borderRadius: BorderRadius.circular(2),
-            ),
-            child: const Text(
-              '需补货',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.0,
-                color: _ReceiptView._paperTop,
-                fontFamily: 'JetBrainsMono',
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

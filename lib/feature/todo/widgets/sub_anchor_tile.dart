@@ -4,20 +4,11 @@ import '../../../core/designsystem/colors.dart';
 import '../../../core/lunar/lunar_service.dart';
 import '../../../data/models/subscription.dart';
 
-/// 订阅锚点 tile —— 对照 mobile-android-todo.html .sub
-/// 容器：flex 行 alignCenter gap12 padding14x16 minHeight64 底部 1px borderSoft
-/// cal 徽章 40x40 圆角10 1px border（warn 态字色与 border 用 warn）
-/// body title + meta(tag"锚点" + "·" + due)
-/// due warn 态"还有 N 天" warn 色 w500；普通态 muted
 class SubAnchorTile extends StatelessWidget {
   final Subscription sub;
   final DateTime today;
 
-  const SubAnchorTile({
-    super.key,
-    required this.sub,
-    required this.today,
-  });
+  const SubAnchorTile({super.key, required this.sub, required this.today});
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +80,9 @@ class SubAnchorTile extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           color: isWarn ? AppColors.warn : AppColors.muted,
-                          fontWeight: isWarn ? FontWeight.w500 : FontWeight.w400,
+                          fontWeight: isWarn
+                              ? FontWeight.w500
+                              : FontWeight.w400,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),

@@ -6,11 +6,15 @@ import 'package:kurashi/data/models/fridge_change_log.dart';
 void main() {
   group('FridgeChangeLog model', () {
     final base = FridgeChangeLog(
-      id: 1, itemId: 10, itemName: 'Item',
+      id: 1,
+      itemId: 10,
+      itemName: 'Item',
       timestamp: DateTime(2026, 7, 5, 14, 30),
       action: FridgeAction.add,
-      beforeQty: '0', afterQty: '1 L',
-      beforeExpiry: DateTime(2026, 7, 1), afterExpiry: DateTime(2026, 7, 10),
+      beforeQty: '0',
+      afterQty: '1 L',
+      beforeExpiry: DateTime(2026, 7, 1),
+      afterExpiry: DateTime(2026, 7, 10),
     );
 
     test('fields are correctly assigned', () {
@@ -23,9 +27,14 @@ void main() {
 
     test('default id is 0', () {
       final log = FridgeChangeLog(
-        itemId: 1, itemName: 'test', timestamp: DateTime.now(),
-        action: FridgeAction.add, beforeQty: '0', afterQty: '1',
-        beforeExpiry: DateTime.now(), afterExpiry: DateTime.now(),
+        itemId: 1,
+        itemName: 'test',
+        timestamp: DateTime.now(),
+        action: FridgeAction.add,
+        beforeQty: '0',
+        afterQty: '1',
+        beforeExpiry: DateTime.now(),
+        afterExpiry: DateTime.now(),
       );
       expect(log.id, 0);
     });
@@ -49,9 +58,14 @@ void main() {
     test('timestamp preserves time components', () {
       final ts = DateTime(2026, 7, 5, 14, 30, 45);
       final log = FridgeChangeLog(
-        itemId: 1, itemName: 'test', timestamp: ts,
-        action: FridgeAction.add, beforeQty: '0', afterQty: '1',
-        beforeExpiry: DateTime.now(), afterExpiry: DateTime.now(),
+        itemId: 1,
+        itemName: 'test',
+        timestamp: ts,
+        action: FridgeAction.add,
+        beforeQty: '0',
+        afterQty: '1',
+        beforeExpiry: DateTime.now(),
+        afterExpiry: DateTime.now(),
       );
       expect(log.timestamp.hour, 14);
       expect(log.timestamp.minute, 30);
@@ -60,10 +74,15 @@ void main() {
 
     test('itemId survives deletion (for history display)', () {
       final log = FridgeChangeLog(
-        id: 42, itemId: 999, itemName: 'deleted',
-        timestamp: DateTime.now(), action: FridgeAction.delete,
-        beforeQty: '1', afterQty: '0',
-        beforeExpiry: DateTime.now(), afterExpiry: DateTime.now(),
+        id: 42,
+        itemId: 999,
+        itemName: 'deleted',
+        timestamp: DateTime.now(),
+        action: FridgeAction.delete,
+        beforeQty: '1',
+        afterQty: '0',
+        beforeExpiry: DateTime.now(),
+        afterExpiry: DateTime.now(),
       );
       expect(log.itemId, 999);
     });

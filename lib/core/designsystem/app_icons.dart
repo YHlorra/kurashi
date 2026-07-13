@@ -28,12 +28,11 @@ class AppIcons {
 
   // ─── FAB ─────────────────────────────────────────────
 
-  /// 加号 FAB —— 纯 + 号（设计稿路径 M12 5v14M5 12h14，strokeWidth 2.5）
-  static Widget add({Color? color, double size = 24}) =>
-      CustomPaint(
-        size: Size(size, size),
-        painter: _PlusPainter(color ?? AppColors.fg),
-      );
+  /// 加号 FAB
+  static Widget add({Color? color, double size = 24}) => CustomPaint(
+    size: Size(size, size),
+    painter: _PlusPainter(color ?? AppColors.fg),
+  );
 
   // ─── 通用操作 ────────────────────────────────────────
 
@@ -175,8 +174,9 @@ class AppIcons {
       IconPark.fire.outline(fill: color, size: size, strokeWidth: 2);
 
   /// 灭火器
-  static Widget fireExtinguisher({Color? color, double size = 24}) =>
-      IconPark.fireExtinguisher.outline(fill: color, size: size, strokeWidth: 2);
+  static Widget fireExtinguisher({Color? color, double size = 24}) => IconPark
+      .fireExtinguisher
+      .outline(fill: color, size: size, strokeWidth: 2);
 
   // ─── 订阅 preset 通用图标（PetSheet / DocumentSheet / HealthSheet / VehicleSheet） ───
   //
@@ -189,29 +189,37 @@ class AppIcons {
       IconPark.cat.outline(fill: color, size: size, strokeWidth: 2);
   static Widget rabbit({Color? color, double size = 24}) =>
       IconPark.rabbit.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 仓鼠：无 hamster 图标，用小型哺乳动物代
   static Widget bear({Color? color, double size = 24}) =>
       IconPark.bear.outline(fill: color, size: size, strokeWidth: 2);
   static Widget bird({Color? color, double size = 24}) =>
       IconPark.bird.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 狂犬疫苗 / 核心疫苗 / 各类疫苗：IconPark 无 syringe，用注射器代
   static Widget injection({Color? color, double size = 24}) =>
       IconPark.injection.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 心丝虫
   static Widget heart({Color? color, double size = 24}) =>
       IconPark.heart.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 跳蚤蜱虫
   static Widget bug({Color? color, double size = 24}) =>
       IconPark.bug.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 体内驱虫 / 体外驱虫：防护语义
   static Widget protect({Color? color, double size = 24}) =>
       IconPark.protect.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 体检 / 全身体检
   static Widget stethoscope({Color? color, double size = 24}) =>
       IconPark.stethoscope.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 牙科
   static Widget teeth({Color? color, double size = 24}) =>
       IconPark.teeth.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 剪指甲
   static Widget scissors({Color? color, double size = 24}) =>
       IconPark.scissors.outline(fill: color, size: size, strokeWidth: 2);
@@ -220,27 +228,35 @@ class AppIcons {
   /// 身份证（横版）
   static Widget idCardH({Color? color, double size = 24}) =>
       IconPark.idCardH.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 护照
   static Widget passport({Color? color, double size = 24}) =>
       IconPark.passport.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 通用证件 / 驾驶证 / 年检：IconPark 无 drivingLicense，用通用证书代
   static Widget certificate({Color? color, double size = 24}) =>
       IconPark.certificate.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 行驶证（竖版身份证式）
   static Widget idCardV({Color? color, double size = 24}) =>
       IconPark.idCardV.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 港澳通行证
   static Widget passportOne({Color? color, double size = 24}) =>
       IconPark.passportOne.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 居住证
   static Widget idCard({Color? color, double size = 24}) =>
       IconPark.idCard.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 社保卡（银行卡类）
   static Widget bankCard({Color? color, double size = 24}) =>
       IconPark.bankCard.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 医保卡
   static Widget medicalFiles({Color? color, double size = 24}) =>
       IconPark.medicalFiles.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 会员卡
   static Widget vip({Color? color, double size = 24}) =>
       IconPark.vip.outline(fill: color, size: size, strokeWidth: 2);
@@ -249,21 +265,28 @@ class AppIcons {
   /// 眼科
   static Widget eyes({Color? color, double size = 24}) =>
       IconPark.eyes.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 妇科男科 / 妇科检查（多人代）
   static Widget peoples({Color? color, double size = 24}) =>
       IconPark.peoples.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 影像筛查
   static Widget scan({Color? color, double size = 24}) =>
       IconPark.scan.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 慢病复查 / 血压监测（心率图标代）
   static Widget heartRate({Color? color, double size = 24}) =>
       IconPark.heartRate.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 乳腺/宫颈/前列腺/骨密度筛查（通用体检盒代）
   static Widget medicalBox({Color? color, double size = 24}) =>
       IconPark.medicalBox.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 血糖 / 血脂（心电图代）
-  static Widget electrocardiogram({Color? color, double size = 24}) =>
-      IconPark.electrocardiogram.outline(fill: color, size: size, strokeWidth: 2);
+  static Widget electrocardiogram({Color? color, double size = 24}) => IconPark
+      .electrocardiogram
+      .outline(fill: color, size: size, strokeWidth: 2);
+
   /// 皮肤（护肤代）
   static Widget handCream({Color? color, double size = 24}) =>
       IconPark.handCream.outline(fill: color, size: size, strokeWidth: 2);
@@ -272,33 +295,40 @@ class AppIcons {
   /// 机油 / 各类油液（IconPark petrol）
   static Widget petrol({Color? color, double size = 24}) =>
       IconPark.petrol.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 滤芯（通用 filter 图标）
   static Widget filter({Color? color, double size = 24}) =>
       IconPark.filter.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 刹车片 / 刹车
   static Widget brakePads({Color? color, double size = 24}) =>
       IconPark.brakePads.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 轮胎（圆盘代，IconPark 无 tire）
   static Widget recordDisc({Color? color, double size = 24}) =>
       IconPark.recordDisc.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 电瓶
   static Widget carBattery({Color? color, double size = 24}) =>
       IconPark.carBattery.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 车身打蜡 / 外观
   static Widget paint({Color? color, double size = 24}) =>
       IconPark.paint.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 火花塞（电波代）
   static Widget electricWave({Color? color, double size = 24}) =>
       IconPark.electricWave.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 内饰清洁
   static Widget vacuumCleaner({Color? color, double size = 24}) =>
       IconPark.vacuumCleaner.outline(fill: color, size: size, strokeWidth: 2);
+
   /// 交强险 / 商业险（盾代保险）
   static Widget shield({Color? color, double size = 24}) =>
       IconPark.shield.outline(fill: color, size: size, strokeWidth: 2);
 }
 
-/// 纯 + 号 painter —— 设计稿路径 M12 5v14M5 12h14，strokeWidth 2.5，圆头
 class _PlusPainter extends CustomPainter {
   final Color color;
   _PlusPainter(this.color);

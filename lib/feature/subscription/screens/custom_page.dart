@@ -53,21 +53,23 @@ class _CustomPageState extends ConsumerState<CustomPage> {
         setState(() => _error = '日期请填 1-31');
         return;
       }
-      unawaited(submitSub(
-        ref,
-        Subscription(
-          id: 0,
-          title: name,
-          type: SubType.custom,
-          calendar: Calendar.solar,
-          mode: TriggerMode.anchorMonthly,
-          anchorMonth: month,
-          anchorDay: day,
-          leadDays: _leadDays,
-          active: true,
-          createdAt: DateTime.now(),
+      unawaited(
+        submitSub(
+          ref,
+          Subscription(
+            id: 0,
+            title: name,
+            type: SubType.custom,
+            calendar: Calendar.solar,
+            mode: TriggerMode.anchorMonthly,
+            anchorMonth: month,
+            anchorDay: day,
+            leadDays: _leadDays,
+            active: true,
+            createdAt: DateTime.now(),
+          ),
         ),
-      ));
+      );
     } else {
       final intervalStr = _intervalController.text.trim();
       final interval = int.tryParse(intervalStr) ?? 0;
@@ -75,20 +77,22 @@ class _CustomPageState extends ConsumerState<CustomPage> {
         setState(() => _error = '请填间隔天数');
         return;
       }
-      unawaited(submitSub(
-        ref,
-        Subscription(
-          id: 0,
-          title: name,
-          type: SubType.custom,
-          calendar: Calendar.solar,
-          mode: TriggerMode.intervalDays,
-          intervalDays: interval,
-          leadDays: _leadDays,
-          active: true,
-          createdAt: DateTime.now(),
+      unawaited(
+        submitSub(
+          ref,
+          Subscription(
+            id: 0,
+            title: name,
+            type: SubType.custom,
+            calendar: Calendar.solar,
+            mode: TriggerMode.intervalDays,
+            intervalDays: interval,
+            leadDays: _leadDays,
+            active: true,
+            createdAt: DateTime.now(),
+          ),
         ),
-      ));
+      );
     }
     Navigator.pop(context);
   }
@@ -126,7 +130,10 @@ class _CustomPageState extends ConsumerState<CustomPage> {
             const _SectionLabel(label: '重复模式'),
             const SizedBox(height: 8),
             SegmentedControl<TriggerMode>(
-              options: const [TriggerMode.anchorMonthly, TriggerMode.intervalDays],
+              options: const [
+                TriggerMode.anchorMonthly,
+                TriggerMode.intervalDays,
+              ],
               selected: _mode,
               onChanged: (v) {
                 setState(() {
@@ -154,7 +161,10 @@ class _CustomPageState extends ConsumerState<CustomPage> {
                         border: InputBorder.none,
                         isDense: true,
                       ),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -167,7 +177,10 @@ class _CustomPageState extends ConsumerState<CustomPage> {
                         border: InputBorder.none,
                         isDense: true,
                       ),
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -183,7 +196,10 @@ class _CustomPageState extends ConsumerState<CustomPage> {
                   border: InputBorder.none,
                   isDense: true,
                 ),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
             const SizedBox(height: 20),
@@ -194,7 +210,14 @@ class _CustomPageState extends ConsumerState<CustomPage> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                for (final entry in const [(0, '当天'), (1, '1 天'), (3, '3 天'), (7, '7 天'), (14, '14 天'), (30, '30 天')])
+                for (final entry in const [
+                  (0, '当天'),
+                  (1, '1 天'),
+                  (3, '3 天'),
+                  (7, '7 天'),
+                  (14, '14 天'),
+                  (30, '30 天'),
+                ])
                   PresetChip(
                     label: entry.$2,
                     isSelected: _leadDays == entry.$1,
@@ -210,7 +233,10 @@ class _CustomPageState extends ConsumerState<CustomPage> {
           ],
         ),
       ),
-      bottomNavigationBar: FormBottomBar(onAction: _submit, actionEnabled: canSubmit),
+      bottomNavigationBar: FormBottomBar(
+        onAction: _submit,
+        actionEnabled: canSubmit,
+      ),
     );
   }
 }
@@ -225,12 +251,14 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(fontSize: 12, color: AppColors.muted, letterSpacing: 0.48),
+      style: const TextStyle(
+        fontSize: 12,
+        color: AppColors.muted,
+        letterSpacing: 0.48,
+      ),
     );
   }
 }
-
-
 
 class _ErrorBox extends StatelessWidget {
   final String message;
@@ -242,7 +270,7 @@ class _ErrorBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFC53030).withValues(alpha: 0.06),
+        color: AppColors.dangerSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

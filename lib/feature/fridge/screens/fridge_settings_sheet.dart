@@ -38,11 +38,11 @@ class _FridgeSettingsSheetState extends ConsumerState<FridgeSettingsSheet> {
         ),
         child: settingsAsync.when(
           loading: () => const SizedBox(
-              height: 200,
-              child: Center(child: CircularProgressIndicator())),
-          error: (e, _) => SizedBox(
-              height: 200,
-              child: Center(child: Text('读取设置失败：$e'))),
+            height: 200,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+          error: (e, _) =>
+              SizedBox(height: 200, child: Center(child: Text('读取设置失败：$e'))),
           data: (settings) {
             // 第一次进入时把 _pending 同步到当前值
             if (_pending == 0 && settings.fridgeLogRetentionDays != 0) {
@@ -142,9 +142,11 @@ class _FridgeSettingsSheetState extends ConsumerState<FridgeSettingsSheet> {
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
-              child: Text(_pending == settings.fridgeLogRetentionDays
-                  ? '当前：$retentionLabel'
-                  : '保存为：$retentionLabel'),
+              child: Text(
+                _pending == settings.fridgeLogRetentionDays
+                    ? '当前：$retentionLabel'
+                    : '保存为：$retentionLabel',
+              ),
             ),
           ),
         ),
@@ -167,10 +169,7 @@ class _FridgeSettingsSheetState extends ConsumerState<FridgeSettingsSheet> {
             earliest == null
                 ? '当前没有记录。'
                 : '当前 $logCount 条记录，最早 ${_dateOnly(earliest.timestamp)}',
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.muted,
-            ),
+            style: const TextStyle(fontSize: 13, color: AppColors.muted),
           ),
         ),
         const SizedBox(height: 12),
@@ -203,10 +202,7 @@ class _FridgeSettingsSheetState extends ConsumerState<FridgeSettingsSheet> {
                   onPressed: logCount == 0 ? null : _clearAll,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.danger,
-                    side: const BorderSide(
-                      color: AppColors.danger,
-                      width: 1,
-                    ),
+                    side: const BorderSide(color: AppColors.danger, width: 1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(999),
                     ),
@@ -232,9 +228,9 @@ class _FridgeSettingsSheetState extends ConsumerState<FridgeSettingsSheet> {
 
   Future<void> _savePolicy() async {
     final current = await ref.read(fridgeRepositoryProvider).getSettings();
-    await ref.read(fridgeRepositoryProvider).updateSettings(
-          current.copyWith(fridgeLogRetentionDays: _pending),
-        );
+    await ref
+        .read(fridgeRepositoryProvider)
+        .updateSettings(current.copyWith(fridgeLogRetentionDays: _pending));
     if (!mounted) return;
     _toast('已保存：${_describe(_pending)}');
   }
@@ -267,10 +263,7 @@ class _FridgeSettingsSheetState extends ConsumerState<FridgeSettingsSheet> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              '清空',
-              style: TextStyle(color: AppColors.danger),
-            ),
+            child: const Text('清空', style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),
@@ -286,11 +279,11 @@ class _FridgeSettingsSheetState extends ConsumerState<FridgeSettingsSheet> {
   }
 
   static String _describe(int days) => switch (days) {
-        0 => '永久保留',
-        30 => '每月自动清理',
-        90 => '每季度自动清理',
-        _ => '$days 天',
-      };
+    0 => '永久保留',
+    30 => '每月自动清理',
+    90 => '每季度自动清理',
+    _ => '$days 天',
+  };
 
   static String _dateOnly(DateTime d) =>
       '${d.year}/${d.month.toString().padLeft(2, '0')}/${d.day.toString().padLeft(2, '0')}';
@@ -329,7 +322,9 @@ class _Radio extends StatelessWidget {
           children: [
             Radio<int>(
               value: value,
+              // ignore: deprecated_member_use
               groupValue: groupValue,
+              // ignore: deprecated_member_use
               onChanged: onChanged,
               activeColor: AppColors.fg,
             ),

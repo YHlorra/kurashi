@@ -60,7 +60,11 @@ class _FestivalDetailScreenState extends ConsumerState<FestivalDetailScreen> {
               createdAt: today,
             );
             final triggerDate = lunarService.nextTriggerDate(sub, today: today);
-            final dateKey = DateTime(triggerDate.year, triggerDate.month, triggerDate.day);
+            final dateKey = DateTime(
+              triggerDate.year,
+              triggerDate.month,
+              triggerDate.day,
+            );
             grouped.putIfAbsent(dateKey, () => []).add(preset);
           }
           final sortedDates = grouped.keys.toList()..sort();
@@ -71,19 +75,16 @@ class _FestivalDetailScreenState extends ConsumerState<FestivalDetailScreen> {
             children.add(_SectionHeader(date: date));
             for (final preset in grouped[date]!) {
               final subscription = _matchSubscription(subs, preset);
-              children.add(_FestivalRow(
-                preset: preset,
-                subscription: subscription,
-              ));
+              children.add(
+                _FestivalRow(preset: preset, subscription: subscription),
+              );
             }
           }
 
           return Column(
             children: [
               // AppBar
-              FormAppBar(
-                title: _isCn ? '中国节日' : '西方节日',
-              ),
+              FormAppBar(title: _isCn ? '中国节日' : '西方节日'),
               // Body
               Expanded(
                 child: Column(
@@ -129,7 +130,10 @@ class _FestivalDetailScreenState extends ConsumerState<FestivalDetailScreen> {
     );
   }
 
-  Subscription? _matchSubscription(List<Subscription> subs, FestivalPreset preset) {
+  Subscription? _matchSubscription(
+    List<Subscription> subs,
+    FestivalPreset preset,
+  ) {
     for (final s in subs) {
       if (s.type == widget.type && s.title == preset.title) return s;
     }
@@ -164,10 +168,7 @@ class _SectionHeader extends StatelessWidget {
       color: AppColors.bg,
       child: Text(
         '${date.month}月${date.day}日',
-        style: const TextStyle(
-          fontSize: 13,
-          color: AppColors.muted,
-        ),
+        style: const TextStyle(fontSize: 13, color: AppColors.muted),
       ),
     );
   }
@@ -179,10 +180,7 @@ class _FestivalRow extends StatelessWidget {
   final FestivalPreset preset;
   final Subscription? subscription;
 
-  const _FestivalRow({
-    required this.preset,
-    required this.subscription,
-  });
+  const _FestivalRow({required this.preset, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -191,8 +189,8 @@ class _FestivalRow extends StatelessWidget {
     final remindText = sub == null || !sub.active
         ? '无提醒'
         : sub.leadDays <= 0
-            ? '当天提醒'
-            : '提前 ${sub.leadDays} 天';
+        ? '当天提醒'
+        : '提前 ${sub.leadDays} 天';
 
     return InkWell(
       child: Container(
@@ -218,18 +216,12 @@ class _FestivalRow extends StatelessWidget {
               children: [
                 Text(
                   dateText,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.fg,
-                  ),
+                  style: const TextStyle(fontSize: 14, color: AppColors.fg),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   remindText,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.muted,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: AppColors.muted),
                 ),
               ],
             ),
@@ -305,7 +297,9 @@ class _BottomBar extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: busy ? null : onTap,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isSubscribed ? AppColors.success : AppColors.fg,
+                  backgroundColor: isSubscribed
+                      ? AppColors.success
+                      : AppColors.fg,
                   foregroundColor: AppColors.bg,
                   disabledBackgroundColor:
                       (isSubscribed ? AppColors.success : AppColors.fg)
@@ -321,7 +315,9 @@ class _BottomBar extends StatelessWidget {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.bg),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.bg,
+                          ),
                         ),
                       )
                     : Text(
@@ -340,10 +336,7 @@ class _BottomBar extends StatelessWidget {
               const SizedBox(height: 8),
               const Text(
                 '轻按取消订阅',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.muted,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.muted),
               ),
             ],
           ],

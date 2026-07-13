@@ -54,7 +54,9 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
   void _onDescChanged() => setState(() {});
 
   Future<void> _loadTags() async {
-    final settings = await ref.read(appSettingsRepositoryProvider).getSettings();
+    final settings = await ref
+        .read(appSettingsRepositoryProvider)
+        .getSettings();
     if (mounted) {
       setState(() {
         _availableTags = settings.userTags;
@@ -82,7 +84,9 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
             setState(() {
               _availableTags.add(removed);
             });
-            ref.read(appSettingsRepositoryProvider).updateUserTags(_availableTags);
+            ref
+                .read(appSettingsRepositoryProvider)
+                .updateUserTags(_availableTags);
           },
         ),
         duration: const Duration(seconds: 2),
@@ -157,7 +161,9 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
           title: title,
           tag: _selectedTag,
           dueDate: _dueDate,
-          dueTimeMinutes: _enableDueTime && _dueTime != null ? _dueTime!.hour * 60 + _dueTime!.minute : null,
+          dueTimeMinutes: _enableDueTime && _dueTime != null
+              ? _dueTime!.hour * 60 + _dueTime!.minute
+              : null,
           createdAt: DateTime.now(),
         );
         final id = await ref.read(todoRepositoryProvider).addTodo(item);
@@ -165,7 +171,9 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
           unawaited(
             notificationScheduler
                 .scheduleTodoReminder(item.copyWith(id: id))
-                .catchError((Object e) => debugPrint('[notify-error] todo schedule: $e')),
+                .catchError(
+                  (Object e) => debugPrint('[notify-error] todo schedule: $e'),
+                ),
           );
         }
       } else {
@@ -181,7 +189,9 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
           unawaited(
             notificationScheduler
                 .scheduleHabitReminder(habit.copyWith(id: id))
-                .catchError((Object e) => debugPrint('[notify-error] habit schedule: $e')),
+                .catchError(
+                  (Object e) => debugPrint('[notify-error] habit schedule: $e'),
+                ),
           );
         }
       }
@@ -197,7 +207,7 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
 
     return Scaffold(
       backgroundColor: AppColors.bg,
-appBar: FormAppBar(
+      appBar: FormAppBar(
         title: '添加待办',
         onAction: _submit,
         actionEnabled: _canSubmit,
@@ -267,7 +277,10 @@ appBar: FormAppBar(
                     Expanded(
                       child: Text(
                         '${_dueDate!.year} 年 ${_dueDate!.month} 月 ${_dueDate!.day} 日',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     GestureDetector(
@@ -333,7 +346,10 @@ appBar: FormAppBar(
                   if (_enableDueTime)
                     TextButton(
                       onPressed: _pickDueTime,
-                      child: const Text('选择时间', style: TextStyle(fontSize: 14, color: AppColors.muted)),
+                      child: const Text(
+                        '选择时间',
+                        style: TextStyle(fontSize: 14, color: AppColors.muted),
+                      ),
                     ),
                 ],
               ),
@@ -343,7 +359,8 @@ appBar: FormAppBar(
                 children: [
                   Checkbox(
                     value: _enableReminder,
-                    onChanged: (v) => setState(() => _enableReminder = v ?? false),
+                    onChanged: (v) =>
+                        setState(() => _enableReminder = v ?? false),
                   ),
                   const Text('无提醒', style: TextStyle(fontSize: 14)),
                   const Spacer(),
@@ -355,7 +372,10 @@ appBar: FormAppBar(
                   if (_enableReminder)
                     TextButton(
                       onPressed: _pickTime,
-                      child: const Text('选择时间', style: TextStyle(fontSize: 14, color: AppColors.muted)),
+                      child: const Text(
+                        '选择时间',
+                        style: TextStyle(fontSize: 14, color: AppColors.muted),
+                      ),
                     ),
                 ],
               ),
@@ -381,7 +401,8 @@ appBar: FormAppBar(
                 children: [
                   Checkbox(
                     value: _enableReminder,
-                    onChanged: (v) => setState(() => _enableReminder = v ?? false),
+                    onChanged: (v) =>
+                        setState(() => _enableReminder = v ?? false),
                   ),
                   const Text('无提醒', style: TextStyle(fontSize: 14)),
                   const Spacer(),
@@ -393,7 +414,10 @@ appBar: FormAppBar(
                   if (_enableReminder)
                     TextButton(
                       onPressed: _pickTime,
-                      child: const Text('选择时间', style: TextStyle(fontSize: 14, color: AppColors.muted)),
+                      child: const Text(
+                        '选择时间',
+                        style: TextStyle(fontSize: 14, color: AppColors.muted),
+                      ),
                     ),
                 ],
               ),
@@ -406,7 +430,10 @@ appBar: FormAppBar(
           ],
         ),
       ),
-      bottomNavigationBar: FormBottomBar(onAction: _submit, actionEnabled: _canSubmit),
+      bottomNavigationBar: FormBottomBar(
+        onAction: _submit,
+        actionEnabled: _canSubmit,
+      ),
     );
   }
 }
@@ -421,7 +448,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(fontSize: 12, color: AppColors.muted, letterSpacing: 0.48),
+      style: const TextStyle(
+        fontSize: 12,
+        color: AppColors.muted,
+        letterSpacing: 0.48,
+      ),
     );
   }
 }
@@ -436,7 +467,7 @@ class _ErrorBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFC53030).withValues(alpha: 0.06),
+        color: AppColors.dangerSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -469,7 +500,9 @@ class _TagChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.fg : AppColors.bg,
-          border: Border.all(color: isSelected ? AppColors.fg : AppColors.border),
+          border: Border.all(
+            color: isSelected ? AppColors.fg : AppColors.border,
+          ),
           borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
@@ -534,10 +567,7 @@ class _AddTagChip extends StatelessWidget {
           children: [
             Text('+', style: TextStyle(fontSize: 13, color: AppColors.muted)),
             const SizedBox(width: 4),
-            Text(
-              '自定义',
-              style: TextStyle(fontSize: 13, color: AppColors.muted),
-            ),
+            Text('自定义', style: TextStyle(fontSize: 13, color: AppColors.muted)),
           ],
         ),
       ),
@@ -580,7 +610,13 @@ class _InlineAddTagField extends StatelessWidget {
           ),
           TextButton(
             onPressed: onSubmit,
-            child: const Text('✓', style: TextStyle(color: AppColors.fg, fontWeight: FontWeight.w600)),
+            child: const Text(
+              '✓',
+              style: TextStyle(
+                color: AppColors.fg,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           TextButton(
             onPressed: onCancel,
@@ -591,4 +627,3 @@ class _InlineAddTagField extends StatelessWidget {
     );
   }
 }
-

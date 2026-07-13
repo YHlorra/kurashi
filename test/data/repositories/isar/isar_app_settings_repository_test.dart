@@ -20,7 +20,10 @@ void main() {
   });
   tearDownAll(() {
     isar?.close();
-    try { if (isar != null) Directory('${isar!.directory}').deleteSync(recursive: true); } catch (_) {}
+    try {
+      if (isar != null)
+        Directory('${isar!.directory}').deleteSync(recursive: true);
+    } catch (_) {}
   });
 
   group('AppSettingsRepository — 用户行为', () {
@@ -35,7 +38,10 @@ void main() {
     test('用户修改日志保留天数 → 保存后读取一致', () async {
       if (isar == null) return markTestSkipped('Isar 原生库不可用');
       final repo = IsarAppSettingsRepository(isar!);
-      final updated = AppSettings(fridgeLogRetentionDays: 30, fridgeLogLastCleanupAt: DateTime(2026, 7, 10));
+      final updated = AppSettings(
+        fridgeLogRetentionDays: 30,
+        fridgeLogLastCleanupAt: DateTime(2026, 7, 10),
+      );
       await repo.updateSettings(updated);
       final result = await repo.getSettings();
       expect(result.fridgeLogRetentionDays, 30);
@@ -47,7 +53,12 @@ void main() {
       final emitted = <AppSettings>[];
       final sub = repo.watchSettings().listen(emitted.add);
       await Future.delayed(const Duration(milliseconds: 50));
-      await repo.updateSettings(AppSettings(fridgeLogRetentionDays: 7, fridgeLogLastCleanupAt: DateTime.now()));
+      await repo.updateSettings(
+        AppSettings(
+          fridgeLogRetentionDays: 7,
+          fridgeLogLastCleanupAt: DateTime.now(),
+        ),
+      );
       await Future.delayed(const Duration(milliseconds: 50));
       expect(emitted.length, greaterThanOrEqualTo(1));
       expect(emitted.last.fridgeLogRetentionDays, 7);

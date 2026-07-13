@@ -49,7 +49,8 @@ class NotificationInitializer {
     // 此处不引入额外 UI（lazy 原则：系统弹窗已足够清晰）。
     final androidPlugin = FlutterLocalNotificationsPlugin()
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin != null) {
       await androidPlugin.requestNotificationsPermission();
     }
@@ -59,7 +60,7 @@ class NotificationInitializer {
     //    @pragma('vm:entry-point') 注解以便后台 isolate 反射调用。
     //    frequency=24h 周期，initialDelay 对齐首次触发到下一个凌晨 03:00。
     //    existingWorkPolicy=replace 确保重启 App 后覆盖旧任务（避免频率混淆）。
-    await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+    await Workmanager().initialize(callbackDispatcher);
     await Workmanager().registerPeriodicTask(
       kDailyRecalcTaskName, // uniqueName
       kDailyRecalcTaskName, // taskName

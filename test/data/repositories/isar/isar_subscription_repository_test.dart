@@ -19,7 +19,10 @@ void main() {
   });
   tearDownAll(() {
     isar?.close();
-    try { if (isar != null) Directory('${isar!.directory}').deleteSync(recursive: true); } catch (_) {}
+    try {
+      if (isar != null)
+        Directory('${isar!.directory}').deleteSync(recursive: true);
+    } catch (_) {}
   });
 
   group('SubscriptionRepository — 用户行为', () {
@@ -27,11 +30,18 @@ void main() {
       if (isar == null) return markTestSkipped('Isar 原生库不可用');
       final repo = IsarSubscriptionRepository(isar!);
       final before = await repo.watchAll().first;
-      await repo.addSubscription(Subscription(
-        title: 'New Bill', type: SubType.bill, calendar: Calendar.solar,
-        mode: TriggerMode.anchorMonthly, anchorDay: 15, leadDays: 1,
-        active: true, createdAt: DateTime.now(),
-      ));
+      await repo.addSubscription(
+        Subscription(
+          title: 'New Bill',
+          type: SubType.bill,
+          calendar: Calendar.solar,
+          mode: TriggerMode.anchorMonthly,
+          anchorDay: 15,
+          leadDays: 1,
+          active: true,
+          createdAt: DateTime.now(),
+        ),
+      );
       final after = await repo.watchAll().first;
       expect(after.length, before.length + 1);
       expect(after.any((s) => s.title == 'New Bill'), isTrue);
@@ -53,7 +63,9 @@ void main() {
       final repo = IsarSubscriptionRepository(isar!);
       await repo.setActiveByType(SubType.cnFestival, true);
       final subs = await repo.watchAll().first;
-      final festivals = subs.where((s) => s.type == SubType.cnFestival).toList();
+      final festivals = subs
+          .where((s) => s.type == SubType.cnFestival)
+          .toList();
       expect(festivals, isNotEmpty);
       expect(festivals.every((s) => s.active), isTrue);
     });
@@ -63,7 +75,9 @@ void main() {
       final repo = IsarSubscriptionRepository(isar!);
       await repo.setActiveByType(SubType.cnFestival, false);
       final subs = await repo.watchAll().first;
-      final festivals = subs.where((s) => s.type == SubType.cnFestival).toList();
+      final festivals = subs
+          .where((s) => s.type == SubType.cnFestival)
+          .toList();
       expect(festivals.every((s) => !s.active), isTrue);
     });
   });

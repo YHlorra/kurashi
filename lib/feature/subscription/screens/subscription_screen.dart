@@ -96,8 +96,10 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           // 每个类目的计数（仅 active 项）。
           final counts = <_CatKey, int>{};
           for (final cat in _CatKey.values) {
-            counts[cat] = cat.types
-                .fold<int>(0, (sum, t) => sum + (grouped[t]?.length ?? 0));
+            counts[cat] = cat.types.fold<int>(
+              0,
+              (sum, t) => sum + (grouped[t]?.length ?? 0),
+            );
           }
 
           // 9 个 tile 在 "全部" 时全部展示；选中具体类目时按 types 过滤。
@@ -133,7 +135,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     );
   }
 
-  /// 把订阅按 SubType 分组（仅保留 active）。Map<SubType, List<Subscription>>。
+  /// 把订阅按 SubType 分组（仅保留 active）。`Map<SubType, List<Subscription>>`。
   Map<SubType, List<Subscription>> _groupByType(List<Subscription> subs) {
     final map = <SubType, List<Subscription>>{};
     for (final sub in subs) {
@@ -175,11 +177,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         icon: AppIcons.home(),
         count: countOf(SubType.homeMaintenance),
         onTap: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => const HomeSheet(),
-            ),
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const HomeSheet(),
+        ),
       ),
       _TileData(
         title: '宠物',
@@ -187,11 +189,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         icon: AppIcons.pet(),
         count: countOf(SubType.petCare),
         onTap: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => const PetSheet(),
-            ),
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const PetSheet(),
+        ),
       ),
       _TileData(
         title: '证件',
@@ -199,11 +201,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         icon: AppIcons.document(),
         count: countOf(SubType.document),
         onTap: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => const DocumentSheet(),
-            ),
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const DocumentSheet(),
+        ),
       ),
       _TileData(
         title: '健康',
@@ -211,11 +213,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         icon: AppIcons.health(),
         count: countOf(SubType.healthCheck),
         onTap: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => const HealthSheet(),
-            ),
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const HealthSheet(),
+        ),
       ),
       _TileData(
         title: '车辆',
@@ -223,32 +225,41 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         icon: AppIcons.vehicle(),
         count: countOf(SubType.vehicle),
         onTap: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => const VehicleSheet(),
-            ),
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const VehicleSheet(),
+        ),
       ),
       _TileData(
         title: '生日',
         type: SubType.birthday,
         icon: AppIcons.birthday(),
         count: countOf(SubType.birthday),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BirthdayPage())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const BirthdayPage()),
+        ),
       ),
       _TileData(
         title: '还款',
         type: SubType.bill,
         icon: AppIcons.bill(),
         count: countOf(SubType.bill),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BillPage())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const BillPage()),
+        ),
       ),
       _TileData(
         title: '自定义',
         type: SubType.custom,
         icon: AppIcons.custom(),
         count: countOf(SubType.custom),
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomPage())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const CustomPage()),
+        ),
       ),
     ];
   }
@@ -259,9 +270,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
   /// 不污染 go_router 注册表。详情页内订阅状态由 StreamBuilder 自行驱动。
   void _openFestivalDetail(SubType type) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => FestivalDetailScreen(type: type),
-      ),
+      MaterialPageRoute<void>(builder: (_) => FestivalDetailScreen(type: type)),
     );
   }
 }
@@ -295,7 +304,9 @@ class _Lede extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.borderSoft, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderSoft, width: 1),
+        ),
       ),
       child: const Text(
         '选一个类别，一次订阅一类。',
@@ -461,7 +472,9 @@ class _CategoryBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.borderSoft, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderSoft, width: 1),
+        ),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,

@@ -18,30 +18,33 @@ final GoRouter appRouter = GoRouter(
         return AppShell(navigationShell: navigationShell);
       },
       branches: [
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/todo',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: TodoScreen(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/todo',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: TodoScreen()),
             ),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/subscription',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: SubscriptionScreen(),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/subscription',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: SubscriptionScreen()),
             ),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/fridge',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: FridgeScreen(),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/fridge',
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: FridgeScreen()),
             ),
-          ),
-        ]),
+          ],
+        ),
       ],
     ),
   ],
@@ -85,9 +88,7 @@ class _BottomNavBar extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.bg,
-        border: Border(
-          top: BorderSide(color: AppColors.borderSoft, width: 1),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderSoft, width: 1)),
       ),
       child: SafeArea(
         top: false,
@@ -98,19 +99,25 @@ class _BottomNavBar extends StatelessWidget {
             children: [
               _NavItem(
                 label: 'Todo',
-                icon: AppIcons.todo(color: currentIndex == 0 ? AppColors.fg : AppColors.muted),
+                icon: AppIcons.todo(
+                  color: currentIndex == 0 ? AppColors.fg : AppColors.muted,
+                ),
                 isSelected: currentIndex == 0,
                 onTap: () => onTabSelected(0),
               ),
               _NavItem(
                 label: '订阅',
-                icon: AppIcons.subscription(color: currentIndex == 1 ? AppColors.fg : AppColors.muted),
+                icon: AppIcons.subscription(
+                  color: currentIndex == 1 ? AppColors.fg : AppColors.muted,
+                ),
                 isSelected: currentIndex == 1,
                 onTap: () => onTabSelected(1),
               ),
               _NavItem(
                 label: '冰箱',
-                icon: AppIcons.fridge(color: currentIndex == 2 ? AppColors.fg : AppColors.muted),
+                icon: AppIcons.fridge(
+                  color: currentIndex == 2 ? AppColors.fg : AppColors.muted,
+                ),
                 isSelected: currentIndex == 2,
                 onTap: () => onTabSelected(2),
               ),

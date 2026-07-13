@@ -54,7 +54,9 @@ class _DayCell extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.fg : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: isSelected ? null : Border.all(color: AppColors.border, width: 1),
+          border: isSelected
+              ? null
+              : Border.all(color: AppColors.border, width: 1),
         ),
         alignment: Alignment.center,
         child: Text(

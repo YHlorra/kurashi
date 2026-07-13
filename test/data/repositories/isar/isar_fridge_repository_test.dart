@@ -20,22 +20,34 @@ void main() {
   });
   tearDownAll(() {
     isar?.close();
-    try { if (isar != null) Directory('${isar!.directory}').deleteSync(recursive: true); } catch (_) {}
+    try {
+      if (isar != null)
+        Directory('${isar!.directory}').deleteSync(recursive: true);
+    } catch (_) {}
   });
 
   IsarFridgeRepository repo() => IsarFridgeRepository(isar!);
 
   FridgeItem item({
-    int id = 0, String name = 'test-item', String quantity = '1 kg',
-    DateTime? addedDate, DateTime? expiryDate, String? tag,
-    int remainingPercent = 100, bool restockEnabled = false,
-    int restockThresholdPercent = 20, String restockQty = '',
+    int id = 0,
+    String name = 'test-item',
+    String quantity = '1 kg',
+    DateTime? addedDate,
+    DateTime? expiryDate,
+    String? tag,
+    int remainingPercent = 100,
+    bool restockEnabled = false,
+    int restockThresholdPercent = 20,
+    String restockQty = '',
   }) {
     return FridgeItem(
-      id: id, name: name, quantity: quantity,
+      id: id,
+      name: name,
+      quantity: quantity,
       addedDate: addedDate ?? DateTime(2026, 7, 1),
       expiryDate: expiryDate ?? DateTime(2026, 7, 10),
-      tag: tag, remainingPercent: remainingPercent,
+      tag: tag,
+      remainingPercent: remainingPercent,
       restockEnabled: restockEnabled,
       restockThresholdPercent: restockThresholdPercent,
       restockQty: restockQty,
@@ -105,9 +117,13 @@ void main() {
       final settings = await repo().getSettings();
       final originalDays = settings.fridgeLogRetentionDays;
       await repo().updateSettings(settings.copyWith(fridgeLogRetentionDays: 0));
-      final cleared = await repo().clearChangeLogOlderThan(DateTime.fromMillisecondsSinceEpoch(1));
+      final cleared = await repo().clearChangeLogOlderThan(
+        DateTime.fromMillisecondsSinceEpoch(1),
+      );
       expect(cleared, 0);
-      await repo().updateSettings(settings.copyWith(fridgeLogRetentionDays: originalDays));
+      await repo().updateSettings(
+        settings.copyWith(fridgeLogRetentionDays: originalDays),
+      );
     });
   });
 
@@ -116,7 +132,9 @@ void main() {
       if (isar == null) return markTestSkipped('Isar 原生库不可用');
       final items = await repo().watchAll().first;
       final target = items.first;
-      await repo().updateItem(target.copyWith(restockEnabled: true, restockQty: '500 g'));
+      await repo().updateItem(
+        target.copyWith(restockEnabled: true, restockQty: '500 g'),
+      );
       final after = await repo().watchAll().first;
       expect(after.firstWhere((i) => i.id == target.id).restockEnabled, isTrue);
     });

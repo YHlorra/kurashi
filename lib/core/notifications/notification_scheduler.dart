@@ -77,7 +77,13 @@ class NotificationScheduler {
     final time = habit.reminderTime!;
     final now = DateTime.now();
     // 首次触发：今日该时间，若已过则明日
-    var scheduled = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    var scheduled = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
     if (scheduled.isBefore(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }
@@ -106,7 +112,13 @@ class NotificationScheduler {
     final triggerDate = lunarService.nextTriggerDate(sub);
     final notifyDay = triggerDate.subtract(Duration(days: sub.leadDays));
     final now = DateTime.now();
-    final scheduled = DateTime(notifyDay.year, notifyDay.month, notifyDay.day, 9, 0);
+    final scheduled = DateTime(
+      notifyDay.year,
+      notifyDay.month,
+      notifyDay.day,
+      9,
+      0,
+    );
     if (scheduled.isBefore(now)) return; // 已过则跳过
 
     final triggerStr = '${triggerDate.month}月${triggerDate.day}日';
@@ -180,7 +192,9 @@ class NotificationScheduler {
   Future<void> cancelFridge(int id) async {
     if (!_isMobile) return;
     await _plugin.cancel(id: _fridgePrefix * 1000000 + id);
-    await _plugin.cancel(id: _fridgePrefix * 1000000 + _fridgeAdvanceOffset + id);
+    await _plugin.cancel(
+      id: _fridgePrefix * 1000000 + _fridgeAdvanceOffset + id,
+    );
   }
 
   /// 取消全部通知 —— 用于 background_worker 每日重排前清场。
@@ -212,7 +226,10 @@ class NotificationScheduler {
       priority: Priority.high,
     );
     const iosDetails = DarwinNotificationDetails();
-    const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     final tzScheduled = tz.TZDateTime.from(scheduled, tz.local);
     await _plugin.zonedSchedule(

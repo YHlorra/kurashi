@@ -13,15 +13,14 @@ class AppFonts {
   /// Inter 仅 Latin；中文字符走 NotoSansSC（已 bundle，跨端一致）；
   /// 其余为系统兜底，仅在 bundle 字体加载失败时使用
   static const List<String> sansFallback = [
-    'NotoSansSC',          // 中文 fallback（已 bundle）
-    'Helvetica Neue',      // iOS 原生
-    'PingFang SC',         // macOS/iOS 中文
-    'Microsoft YaHei',     // Windows 中文
-    'Roboto',              // Android
+    'NotoSansSC', // 中文 fallback（已 bundle）
+    'Helvetica Neue', // iOS 原生
+    'PingFang SC', // macOS/iOS 中文
+    'Microsoft YaHei', // Windows 中文
+    'Roboto', // Android
     'Segoe UI',
     'Arial',
   ];
-
 }
 
 /// 全局 ThemeData —— Helvetica 单色调美学，非 Material 3 默认紫色

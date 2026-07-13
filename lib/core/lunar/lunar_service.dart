@@ -108,7 +108,9 @@ class LunarService {
       case SpecialFestivalType.qingming:
         // lunar 包的 JieQi 表覆盖整个农历年，5/1 必落在农历 year 年内（农历年从
         // 公历 1-2 月开始），故 getJieQiTable()['清明'] 即为公历 year 年的清明。
-        final solar = Lunar.fromDate(DateTime(year, 5, 1)).getJieQiTable()['清明']!;
+        final solar = Lunar.fromDate(
+          DateTime(year, 5, 1),
+        ).getJieQiTable()['清明']!;
         return DateTime(solar.getYear(), solar.getMonth(), solar.getDay());
       case SpecialFestivalType.mothersDay:
         return _nthWeekdayOfMonth(year, 5, DateTime.sunday, 2);
@@ -144,7 +146,11 @@ class LunarService {
     var candidate = DateTime(todayDate.year, sub.anchorMonth!, sub.anchorDay!);
     if (!candidate.isAfter(todayDate)) {
       // 今年该月日已过（含今日），取明年
-      candidate = DateTime(todayDate.year + 1, sub.anchorMonth!, sub.anchorDay!);
+      candidate = DateTime(
+        todayDate.year + 1,
+        sub.anchorMonth!,
+        sub.anchorDay!,
+      );
     }
     return candidate;
   }
@@ -154,9 +160,19 @@ class LunarService {
   /// 取今日对应的农历年，构造农历该年该月日 → 公历；若已过则用农历明年再算。
   DateTime _nextLunarAnchor(Subscription sub, DateTime todayDate) {
     final lunarYear = Lunar.fromDate(todayDate).getYear();
-    var candidate = lunarToSolar(lunarYear, sub.anchorMonth!, sub.anchorDay!, false);
+    var candidate = lunarToSolar(
+      lunarYear,
+      sub.anchorMonth!,
+      sub.anchorDay!,
+      false,
+    );
     if (!candidate.isAfter(todayDate)) {
-      candidate = lunarToSolar(lunarYear + 1, sub.anchorMonth!, sub.anchorDay!, false);
+      candidate = lunarToSolar(
+        lunarYear + 1,
+        sub.anchorMonth!,
+        sub.anchorDay!,
+        false,
+      );
     }
     return candidate;
   }
@@ -167,8 +183,11 @@ class LunarService {
   /// 作为起点向前滚动（Task 11 单测会验证滚动逻辑）。
   DateTime _nextInterval(Subscription sub, DateTime todayDate) {
     final interval = sub.intervalDays!;
-    var candidate =
-        DateTime(sub.createdAt.year, sub.createdAt.month, sub.createdAt.day);
+    var candidate = DateTime(
+      sub.createdAt.year,
+      sub.createdAt.month,
+      sub.createdAt.day,
+    );
     while (!candidate.isAfter(todayDate)) {
       candidate = candidate.add(Duration(days: interval));
     }

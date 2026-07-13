@@ -30,9 +30,7 @@ class IsarFridgeRepository implements FridgeRepository {
 
   @override
   Stream<List<FridgeChangeLog>> watchChangeLog() {
-    return isar.fridgeChangeLogs
-        .watchLazy(fireImmediately: true)
-        .map((_) {
+    return isar.fridgeChangeLogs.watchLazy(fireImmediately: true).map((_) {
       // 倒序：Dart 层排序（未建 timestamp 索引；行数小，性能可接受）。
       // 二次按 id 降序做 stable tie-break——毫秒级 DateTime.now() 撞档时
       // 保证晚入库的排在前面。
@@ -62,25 +60,26 @@ class IsarFridgeRepository implements FridgeRepository {
   @override
   Future<int> addItem(FridgeItem item) async {
     return isar.write((isar) {
-      final newId =
-          item.id == 0 ? isar.fridgeItems.autoIncrement() : item.id;
+      final newId = item.id == 0 ? isar.fridgeItems.autoIncrement() : item.id;
       final saved = item.copyWith(id: newId);
       isar.fridgeItems.put(saved);
       // ponytail: 显式 autoIncrement + put。
       // isar_plus 1.3.7 的 put 对 id=0 没有保证 auto-increment（社区 fork
       // 语义模糊），实测会把 4 条日志都覆盖到 id=0 上，结果只剩最后一条。
       // 与 FridgeItem 同步路径，预先 autoIncrement 再 put。
-      isar.fridgeChangeLogs.put(FridgeChangeLog(
-        id: isar.fridgeChangeLogs.autoIncrement(),
-        itemId: newId,
-        itemName: saved.name,
-        timestamp: DateTime.now(),
-        action: FridgeAction.add,
-        beforeQty: '0',
-        afterQty: saved.quantity,
-        beforeExpiry: saved.addedDate,
-        afterExpiry: saved.expiryDate,
-      ));
+      isar.fridgeChangeLogs.put(
+        FridgeChangeLog(
+          id: isar.fridgeChangeLogs.autoIncrement(),
+          itemId: newId,
+          itemName: saved.name,
+          timestamp: DateTime.now(),
+          action: FridgeAction.add,
+          beforeQty: '0',
+          afterQty: saved.quantity,
+          beforeExpiry: saved.addedDate,
+          afterExpiry: saved.expiryDate,
+        ),
+      );
       return newId;
     });
   }
@@ -95,17 +94,19 @@ class IsarFridgeRepository implements FridgeRepository {
       if (old == null) return;
       if (!old.hasBusinessChange(item)) return;
       isar.fridgeItems.put(item);
-      isar.fridgeChangeLogs.put(FridgeChangeLog(
-        id: isar.fridgeChangeLogs.autoIncrement(),
-        itemId: item.id,
-        itemName: item.name,
-        timestamp: DateTime.now(),
-        action: FridgeAction.update,
-        beforeQty: old.quantity,
-        afterQty: item.quantity,
-        beforeExpiry: old.expiryDate,
-        afterExpiry: item.expiryDate,
-      ));
+      isar.fridgeChangeLogs.put(
+        FridgeChangeLog(
+          id: isar.fridgeChangeLogs.autoIncrement(),
+          itemId: item.id,
+          itemName: item.name,
+          timestamp: DateTime.now(),
+          action: FridgeAction.update,
+          beforeQty: old.quantity,
+          afterQty: item.quantity,
+          beforeExpiry: old.expiryDate,
+          afterExpiry: item.expiryDate,
+        ),
+      );
     });
   }
 
@@ -116,17 +117,19 @@ class IsarFridgeRepository implements FridgeRepository {
       if (old == null) return;
       isar.fridgeItems.delete(id);
       // 硬删后写日志：日志保留，UI 可正常展示「茄子 半袋 → 0」历史
-      isar.fridgeChangeLogs.put(FridgeChangeLog(
-        id: isar.fridgeChangeLogs.autoIncrement(),
-        itemId: id,
-        itemName: old.name,
-        timestamp: DateTime.now(),
-        action: FridgeAction.delete,
-        beforeQty: old.quantity,
-        afterQty: '0',
-        beforeExpiry: old.expiryDate,
-        afterExpiry: old.expiryDate,
-      ));
+      isar.fridgeChangeLogs.put(
+        FridgeChangeLog(
+          id: isar.fridgeChangeLogs.autoIncrement(),
+          itemId: id,
+          itemName: old.name,
+          timestamp: DateTime.now(),
+          action: FridgeAction.delete,
+          beforeQty: old.quantity,
+          afterQty: '0',
+          beforeExpiry: old.expiryDate,
+          afterExpiry: old.expiryDate,
+        ),
+      );
     });
   }
 
@@ -136,17 +139,19 @@ class IsarFridgeRepository implements FridgeRepository {
     // 日志：beforeQty="0"（撤之前曾出库）afterQty=item.quantity。
     isar.write((isar) {
       isar.fridgeItems.put(item);
-      isar.fridgeChangeLogs.put(FridgeChangeLog(
-        id: isar.fridgeChangeLogs.autoIncrement(),
-        itemId: item.id,
-        itemName: item.name,
-        timestamp: DateTime.now(),
-        action: FridgeAction.restore,
-        beforeQty: '0',
-        afterQty: item.quantity,
-        beforeExpiry: item.addedDate,
-        afterExpiry: item.expiryDate,
-      ));
+      isar.fridgeChangeLogs.put(
+        FridgeChangeLog(
+          id: isar.fridgeChangeLogs.autoIncrement(),
+          itemId: item.id,
+          itemName: item.name,
+          timestamp: DateTime.now(),
+          action: FridgeAction.restore,
+          beforeQty: '0',
+          afterQty: item.quantity,
+          beforeExpiry: item.addedDate,
+          afterExpiry: item.expiryDate,
+        ),
+      );
     });
   }
 
@@ -204,8 +209,10 @@ class IsarFridgeRepository implements FridgeRepository {
     const encoder = JsonEncoder.withIndent('  ');
     final content = encoder.convert(json);
     final dir = await getTemporaryDirectory();
-    final stamp =
-        DateTime.now().toIso8601String().replaceAll(RegExp(r'[^0-9]'), '');
+    final stamp = DateTime.now().toIso8601String().replaceAll(
+      RegExp(r'[^0-9]'),
+      '',
+    );
     final file = File('${dir.path}/fridge_log_${scope.name}_$stamp.json');
     await file.writeAsString(content);
     return file.path;
@@ -240,8 +247,7 @@ class IsarFridgeRepository implements FridgeRepository {
     try {
       final s = await getSettings();
       if (s.fridgeLogRetentionDays == 0) return; // 永久
-      final cutoff =
-          now.subtract(Duration(days: s.fridgeLogRetentionDays));
+      final cutoff = now.subtract(Duration(days: s.fridgeLogRetentionDays));
       final rolled = _hasBucketRolled(
         s.fridgeLogLastCleanupAt,
         now,
@@ -295,7 +301,13 @@ class IsarFridgeRepository implements FridgeRepository {
   Future<List<RestockCandidate>> getRestockCandidates() async {
     return isar.write((isar) {
       final all = isar.fridgeItems.where().findAll();
-      final restocked = all.where((i) => i.restockEnabled && i.remainingPercent <= i.restockThresholdPercent).toList();
+      final restocked = all
+          .where(
+            (i) =>
+                i.restockEnabled &&
+                i.remainingPercent <= i.restockThresholdPercent,
+          )
+          .toList();
       restocked.sort((a, b) => a.expiryDate.compareTo(b.expiryDate));
       final groups = <String, List<FridgeItem>>{};
       for (final item in restocked) {
@@ -303,10 +315,14 @@ class IsarFridgeRepository implements FridgeRepository {
       }
       return groups.entries.map((e) {
         final batches = e.value;
-        final earliest = batches.map((b) => b.expiryDate).reduce((a, b) => a.isBefore(b) ? a : b);
+        final earliest = batches
+            .map((b) => b.expiryDate)
+            .reduce((a, b) => a.isBefore(b) ? a : b);
         return RestockCandidate(
           name: e.key,
-          restockQty: batches.first.restockQty.isNotEmpty ? batches.first.restockQty : batches.first.quantity,
+          restockQty: batches.first.restockQty.isNotEmpty
+              ? batches.first.restockQty
+              : batches.first.quantity,
           batches: batches,
           earliestExpiry: earliest,
         );

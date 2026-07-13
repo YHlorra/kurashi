@@ -8,9 +8,6 @@ import '../../../data/models/habit.dart';
 import '../../../data/models/habit_checkin.dart';
 import '../../../data/repositories/providers.dart';
 
-/// 习惯 tile —— 对照 mobile-android-todo.html .habit
-/// 容器：flex 行 alignCenter gap12 padding14x16 minHeight76 底部 1px borderSoft
-/// ring 48x48 环形进度（CustomPaint）+ body + checkin 按钮 48x48
 class HabitTile extends ConsumerWidget {
   final Habit habit;
   final DateTime today;
@@ -25,8 +22,9 @@ class HabitTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final checkinsStream =
-        ref.watch(habitRepositoryProvider).watchCheckinsFor(habit.id, weekStart);
+    final checkinsStream = ref
+        .watch(habitRepositoryProvider)
+        .watchCheckinsFor(habit.id, weekStart);
 
     return StreamBuilder<List<HabitCheckin>>(
       stream: checkinsStream,
@@ -69,13 +67,16 @@ class HabitTile extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                     Row(
-                       crossAxisAlignment: CrossAxisAlignment.center,
-                       children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
                         if (habit.tag != null) ...[
                           Container(
                             constraints: const BoxConstraints(maxHeight: 18),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.surface,
                               borderRadius: BorderRadius.circular(4),
@@ -98,14 +99,15 @@ class HabitTile extends ConsumerWidget {
                           ),
                         ),
                       ],
-                     ),
+                    ),
                   ],
                 ),
               ),
               // checkin 按钮
               _CheckinButton(
                 checked: checkedToday,
-                onTap: () => _toggleCheckin(ref, habit.id, todayDate, checkedToday),
+                onTap: () =>
+                    _toggleCheckin(ref, habit.id, todayDate, checkedToday),
               ),
             ],
           ),
@@ -209,7 +211,8 @@ class _RingPainter extends CustomPainter {
       center,
       radius,
       Paint()
-        ..color = AppColors.surfaceWarm // #EEEEEE
+        ..color = AppColors
+            .surfaceWarm // #EEEEEE
         ..style = PaintingStyle.stroke
         ..strokeWidth = 4,
     );

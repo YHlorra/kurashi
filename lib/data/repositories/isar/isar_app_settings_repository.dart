@@ -39,7 +39,7 @@ class IsarAppSettingsRepository implements AppSettingsRepository {
   }
 
   static AppSettings get _defaultSettings => AppSettings(
-        fridgeLogRetentionDays: 0,
-        fridgeLogLastCleanupAt: DateTime.fromMillisecondsSinceEpoch(0),
-      );
+    fridgeLogRetentionDays: 0,
+    fridgeLogLastCleanupAt: DateTime.fromMillisecondsSinceEpoch(0),
+  );
 }

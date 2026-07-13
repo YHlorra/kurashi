@@ -63,7 +63,8 @@ class FridgeItem {
       tag: tag ?? this.tag,
       remainingPercent: remainingPercent ?? this.remainingPercent,
       restockEnabled: restockEnabled ?? this.restockEnabled,
-      restockThresholdPercent: restockThresholdPercent ?? this.restockThresholdPercent,
+      restockThresholdPercent:
+          restockThresholdPercent ?? this.restockThresholdPercent,
       restockQty: restockQty ?? this.restockQty,
     );
   }

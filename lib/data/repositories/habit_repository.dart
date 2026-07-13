@@ -4,6 +4,7 @@ import '../models/habit_checkin.dart';
 /// 习惯仓库抽象接口
 abstract class HabitRepository {
   Stream<List<Habit>> watchAll();
+
   /// 新增习惯，返回分配后的 id（用于通知调度）
   Future<int> addHabit(Habit habit);
   Future<void> deleteHabit(int id);

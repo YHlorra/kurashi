@@ -120,11 +120,7 @@ class SheetScaffold extends StatelessWidget {
             ),
             const Divider(height: 1, color: AppColors.borderSoft),
             // Body — Flexible so the scroll view gets bounded height
-            Flexible(
-              child: SingleChildScrollView(
-                child: body,
-              ),
-            ),
+            Flexible(child: SingleChildScrollView(child: body)),
           ],
         ),
       ),
@@ -327,10 +323,16 @@ class RemindBeforeSegmented extends StatelessWidget {
 /// Write a subscription to the repository and schedule its reminder.
 /// Shared by all subscription form sheets so the side-effect lives in one place.
 Future<void> submitSub(WidgetRef ref, Subscription sub) async {
-  final id = await ref.read(subscriptionRepositoryProvider).addSubscription(sub);
-  unawaited(notificationScheduler
-      .scheduleSubscriptionReminder(sub.copyWith(id: id))
-      .catchError((Object e) => debugPrint('[notify-error] sub schedule: $e')));
+  final id = await ref
+      .read(subscriptionRepositoryProvider)
+      .addSubscription(sub);
+  unawaited(
+    notificationScheduler
+        .scheduleSubscriptionReminder(sub.copyWith(id: id))
+        .catchError(
+          (Object e) => debugPrint('[notify-error] sub schedule: $e'),
+        ),
+  );
 }
 
 /// Reusable date field for bottom-sheet forms.
@@ -367,7 +369,10 @@ class SheetDateField extends StatelessWidget {
               onTap: onClear,
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Text('清除', style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                child: Text(
+                  '清除',
+                  style: TextStyle(fontSize: 13, color: AppColors.muted),
+                ),
               ),
             ),
         ],

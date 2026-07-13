@@ -53,8 +53,7 @@ class _FridgeHistoryScreenState extends ConsumerState<FridgeHistoryScreen> {
           try {
             await ref
                 .read(fridgeRepositoryProvider)
-                .updateSettings(
-                    current.copyWithFridgeLogLastSeenId(maxId));
+                .updateSettings(current.copyWithFridgeLogLastSeenId(maxId));
           } catch (e) {
             // ponytail: 写失败不让崩溃 UI，但需可观测。后续真机回归时排查。
             debugPrint('[fridge-history] mark-as-seen failed: $e');
@@ -112,21 +111,15 @@ class _FridgeHistoryScreenState extends ConsumerState<FridgeHistoryScreen> {
               alignment: Alignment.centerLeft,
               child: Text(
                 _scopeLabel(_scope),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.muted,
-                ),
+                style: const TextStyle(fontSize: 12, color: AppColors.muted),
               ),
             ),
           ),
           Expanded(
             child: logsAsync.when(
               data: _buildList,
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Text('加载失败：$e'),
-              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('加载失败：$e')),
             ),
           ),
         ],
@@ -157,17 +150,13 @@ class _FridgeHistoryScreenState extends ConsumerState<FridgeHistoryScreen> {
     switch (_scope) {
       case ReportScope.day:
         final start = DateTime(now.year, now.month, now.day);
-        return all
-            .where((e) => !e.timestamp.isBefore(start))
-            .toList();
+        return all.where((e) => !e.timestamp.isBefore(start)).toList();
       case ReportScope.week:
         final cutoff = now.subtract(const Duration(days: 7));
         return all.where((e) => !e.timestamp.isBefore(cutoff)).toList();
       case ReportScope.month:
         final start = DateTime(now.year, now.month);
-        return all
-            .where((e) => !e.timestamp.isBefore(start))
-            .toList();
+        return all.where((e) => !e.timestamp.isBefore(start)).toList();
       case ReportScope.all:
         return all;
     }
@@ -207,8 +196,8 @@ class _FridgeHistoryScreenState extends ConsumerState<FridgeHistoryScreen> {
     final hint = _scope == ReportScope.day
         ? '今天还没操作过食材。'
         : _scope == ReportScope.week
-            ? '近 7 天无变更。'
-            : '本月无变更，去入库看看吧。';
+        ? '近 7 天无变更。'
+        : '本月无变更，去入库看看吧。';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 80),
       child: Center(
@@ -260,10 +249,9 @@ class _FridgeHistoryScreenState extends ConsumerState<FridgeHistoryScreen> {
       final path = await ref
           .read(fridgeRepositoryProvider)
           .exportChangeLogJson(scope: _scope, entries: entries);
-      await Share.shareXFiles(
-        [XFile(path, mimeType: 'application/json')],
-        text: 'kurashi 冰箱 ${_scope.name}报',
-      );
+      await Share.shareXFiles([
+        XFile(path, mimeType: 'application/json'),
+      ], text: 'kurashi 冰箱 ${_scope.name}报');
     } on PlatformException catch (e) {
       _toast('导出失败：${e.message ?? e.code}');
     } catch (e) {
@@ -295,8 +283,8 @@ class _LogTile extends StatelessWidget {
     final qtyChanged = entry.beforeQty != entry.afterQty;
     final expiryChanged =
         entry.beforeExpiry.year != entry.afterExpiry.year ||
-            entry.beforeExpiry.month != entry.afterExpiry.month ||
-            entry.beforeExpiry.day != entry.afterExpiry.day;
+        entry.beforeExpiry.month != entry.afterExpiry.month ||
+        entry.beforeExpiry.day != entry.afterExpiry.day;
 
     final meta = _actionMeta(entry.action);
 
@@ -314,10 +302,7 @@ class _LogTile extends StatelessWidget {
               children: [
                 Text(
                   dateStr,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.muted,
-                  ),
+                  style: const TextStyle(fontSize: 11, color: AppColors.muted),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -352,10 +337,7 @@ class _LogTile extends StatelessWidget {
                   qtyChanged
                       ? '${entry.beforeQty} → ${entry.afterQty}'
                       : '数量未变',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.muted,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: AppColors.muted),
                 ),
                 if (expiryChanged) ...[
                   const SizedBox(height: 2),
@@ -375,8 +357,7 @@ class _LogTile extends StatelessWidget {
             tooltip: '删除这条记录',
             onPressed: () => _confirmDelete(context),
             padding: EdgeInsets.zero,
-            constraints:
-                const BoxConstraints(minWidth: 32, minHeight: 32),
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
         ],
       ),
@@ -388,9 +369,7 @@ class _LogTile extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('删除这条记录？'),
-        content: Text(
-          '${entry.itemName} · ${entry.action.name}',
-        ),
+        content: Text('${entry.itemName} · ${entry.action.name}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -398,10 +377,7 @@ class _LogTile extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              '删除',
-              style: TextStyle(color: AppColors.danger),
-            ),
+            child: const Text('删除', style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),
@@ -417,14 +393,24 @@ class _LogTile extends StatelessWidget {
     switch (a) {
       case FridgeAction.add:
         return _ActionMeta(
-            AppIcons.actionAdd(color: AppColors.success), AppColors.success);
+          AppIcons.actionAdd(color: AppColors.success),
+          AppColors.success,
+        );
       case FridgeAction.update:
-        return _ActionMeta(AppIcons.actionEdit(color: AppColors.fg), AppColors.fg);
+        return _ActionMeta(
+          AppIcons.actionEdit(color: AppColors.fg),
+          AppColors.fg,
+        );
       case FridgeAction.delete:
         return _ActionMeta(
-            AppIcons.actionDelete(color: AppColors.danger), AppColors.danger);
+          AppIcons.actionDelete(color: AppColors.danger),
+          AppColors.danger,
+        );
       case FridgeAction.restore:
-        return _ActionMeta(AppIcons.actionRestore(color: AppColors.warn), AppColors.warn);
+        return _ActionMeta(
+          AppIcons.actionRestore(color: AppColors.warn),
+          AppColors.warn,
+        );
     }
   }
 }

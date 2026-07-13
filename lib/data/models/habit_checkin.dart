@@ -15,17 +15,9 @@ class HabitCheckin {
 
   final DateTime date;
 
-  const HabitCheckin({
-    this.id = 0,
-    required this.habitId,
-    required this.date,
-  });
+  const HabitCheckin({this.id = 0, required this.habitId, required this.date});
 
-  HabitCheckin copyWith({
-    int? id,
-    int? habitId,
-    DateTime? date,
-  }) {
+  HabitCheckin copyWith({int? id, int? habitId, DateTime? date}) {
     return HabitCheckin(
       id: id ?? this.id,
       habitId: habitId ?? this.habitId,

@@ -19,7 +19,10 @@ void main() {
   });
   tearDownAll(() {
     isar?.close();
-    try { if (isar != null) Directory('${isar!.directory}').deleteSync(recursive: true); } catch (_) {}
+    try {
+      if (isar != null)
+        Directory('${isar!.directory}').deleteSync(recursive: true);
+    } catch (_) {}
   });
 
   group('TodoRepository — 用户行为', () {
@@ -39,7 +42,9 @@ void main() {
       final items = await repo.watchAll().first;
       expect(items, isNotEmpty);
       final target = items.first;
-      await repo.updateTodo(target.copyWith(completed: true, completedAt: DateTime.now()));
+      await repo.updateTodo(
+        target.copyWith(completed: true, completedAt: DateTime.now()),
+      );
       final after = await repo.watchAll().first;
       expect(after.firstWhere((t) => t.id == target.id).completed, isTrue);
     });

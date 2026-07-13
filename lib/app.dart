@@ -15,10 +15,7 @@ class KurashiApp extends StatelessWidget {
       routerConfig: appRouter,
       // 中文本地化 —— DatePicker / TimePicker 等系统组件中文文案依赖此配置
       locale: const Locale('zh', 'CN'),
-      supportedLocales: const [
-        Locale('zh', 'CN'),
-        Locale('en'),
-      ],
+      supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

@@ -55,7 +55,8 @@ class _BillPageState extends ConsumerState<BillPage> {
 
   @override
   Widget build(BuildContext context) {
-    final canSubmit = _nameController.text.trim().isNotEmpty && _dayOfMonth != null;
+    final canSubmit =
+        _nameController.text.trim().isNotEmpty && _dayOfMonth != null;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -95,7 +96,10 @@ class _BillPageState extends ConsumerState<BillPage> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => setState(() => _dayOfMonth = null),
-                  child: const Text('清除', style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                  child: const Text(
+                    '清除',
+                    style: TextStyle(fontSize: 13, color: AppColors.muted),
+                  ),
                 ),
               ),
             ],
@@ -107,7 +111,13 @@ class _BillPageState extends ConsumerState<BillPage> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                for (final entry in const [(0, '当天'), (1, '1 天'), (3, '3 天'), (5, '5 天'), (7, '7 天')])
+                for (final entry in const [
+                  (0, '当天'),
+                  (1, '1 天'),
+                  (3, '3 天'),
+                  (5, '5 天'),
+                  (7, '7 天'),
+                ])
                   PresetChip(
                     label: entry.$2,
                     isSelected: _leadDays == entry.$1,
@@ -123,7 +133,10 @@ class _BillPageState extends ConsumerState<BillPage> {
           ],
         ),
       ),
-      bottomNavigationBar: FormBottomBar(onAction: _submit, actionEnabled: canSubmit),
+      bottomNavigationBar: FormBottomBar(
+        onAction: _submit,
+        actionEnabled: canSubmit,
+      ),
     );
   }
 }
@@ -138,12 +151,14 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(fontSize: 12, color: AppColors.muted, letterSpacing: 0.48),
+      style: const TextStyle(
+        fontSize: 12,
+        color: AppColors.muted,
+        letterSpacing: 0.48,
+      ),
     );
   }
 }
-
-
 
 class _ErrorBox extends StatelessWidget {
   final String message;
@@ -155,7 +170,7 @@ class _ErrorBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFC53030).withValues(alpha: 0.06),
+        color: AppColors.dangerSoft,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

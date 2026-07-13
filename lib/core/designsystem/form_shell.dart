@@ -23,7 +23,9 @@ class FormAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.borderSoft, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderSoft, width: 1),
+        ),
       ),
       child: Stack(
         alignment: Alignment.center,

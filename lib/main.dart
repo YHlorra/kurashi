@@ -12,11 +12,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 状态栏图标黑色 + 背景白色
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.white,
-    statusBarIconBrightness: Brightness.dark,
-    statusBarBrightness: Brightness.light,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ),
+  );
 
   final container = ProviderContainer();
 
@@ -27,14 +29,11 @@ void main() async {
   await NotificationInitializer.initialize();
 
   // 阶段 2.x：冷启动跑一次冰箱食材记录保留策略 sweep。
-  await container.read(fridgeRepositoryProvider).runRetentionSweep(
-    DateTime.now(),
-  );
+  await container
+      .read(fridgeRepositoryProvider)
+      .runRetentionSweep(DateTime.now());
 
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const KurashiApp(),
-    ),
+    UncontrolledProviderScope(container: container, child: const KurashiApp()),
   );
 }

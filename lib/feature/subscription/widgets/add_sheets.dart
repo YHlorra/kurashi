@@ -47,13 +47,7 @@ class _HomeSheetState extends ConsumerState<HomeSheet> {
   // 分组让 4×3 平铺不显单调，给 grid 提供节奏。
   // AppIcons.xxx() 返回 outline widget 非 const，故用 final。
   static final _sections = <(String, List<(String, Widget)>)>[
-    (
-      '个人护理',
-      [
-        ('牙刷', AppIcons.brush()),
-        ('电动牙刷头', AppIcons.brush()),
-      ],
-    ),
+    ('个人护理', [('牙刷', AppIcons.brush()), ('电动牙刷头', AppIcons.brush())]),
     (
       '滤芯 / 滤网',
       [
@@ -65,19 +59,10 @@ class _HomeSheetState extends ConsumerState<HomeSheet> {
         ('淋浴头', AppIcons.shower()),
       ],
     ),
-    (
-      '寝具',
-      [
-        ('枕头', AppIcons.sleep()),
-        ('床垫', AppIcons.bed()),
-      ],
-    ),
+    ('寝具', [('枕头', AppIcons.sleep()), ('床垫', AppIcons.bed())]),
     (
       '安全',
-      [
-        ('烟雾报警器电池', AppIcons.fire()),
-        ('灭火器', AppIcons.fireExtinguisher()),
-      ],
+      [('烟雾报警器电池', AppIcons.fire()), ('灭火器', AppIcons.fireExtinguisher())],
     ),
   ];
 
@@ -172,20 +157,22 @@ class _HomeSheetState extends ConsumerState<HomeSheet> {
       setState(() => _error = '请填一个名称');
       return;
     }
-    unawaited(_addSub(
-      ref,
-      Subscription(
-        id: 0,
-        title: name,
-        type: SubType.homeMaintenance,
-        calendar: Calendar.solar,
-        mode: TriggerMode.intervalDays,
-        intervalDays: _cycleDays,
-        leadDays: _leadDays,
-        active: true,
-        createdAt: DateTime.now(),
+    unawaited(
+      _addSub(
+        ref,
+        Subscription(
+          id: 0,
+          title: name,
+          type: SubType.homeMaintenance,
+          calendar: Calendar.solar,
+          mode: TriggerMode.intervalDays,
+          intervalDays: _cycleDays,
+          leadDays: _leadDays,
+          active: true,
+          createdAt: DateTime.now(),
+        ),
       ),
-    ));
+    );
     Navigator.pop(context);
   }
 }
@@ -240,7 +227,8 @@ class _PetSheetState extends ConsumerState<PetSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final canSubmit = _nameController.text.trim().isNotEmpty &&
+    final canSubmit =
+        _nameController.text.trim().isNotEmpty &&
         _selectedCareType != null &&
         _lastDate != null;
     return SheetScaffold(
@@ -351,19 +339,21 @@ class _PetSheetState extends ConsumerState<PetSheet> {
     final title = species.isEmpty
         ? '$_selectedCareType（$name）'
         : '$_selectedCareType（$name·$species）';
-    unawaited(_addSub(
-      ref,
-      Subscription(
-        id: 0,
-        title: title,
-        type: SubType.petCare,
-        calendar: Calendar.solar,
-        mode: TriggerMode.intervalDays,
-        intervalDays: _cycleDays,
-        leadDays: _leadDays,
-        createdAt: _lastDate!,
+    unawaited(
+      _addSub(
+        ref,
+        Subscription(
+          id: 0,
+          title: title,
+          type: SubType.petCare,
+          calendar: Calendar.solar,
+          mode: TriggerMode.intervalDays,
+          intervalDays: _cycleDays,
+          leadDays: _leadDays,
+          createdAt: _lastDate!,
+        ),
       ),
-    ));
+    );
     Navigator.pop(context);
   }
 }
@@ -406,7 +396,8 @@ class _DocumentSheetState extends ConsumerState<DocumentSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final canSubmit = _selectedDocType != null &&
+    final canSubmit =
+        _selectedDocType != null &&
         _holderController.text.trim().isNotEmpty &&
         _expiryDate != null;
     return SheetScaffold(
@@ -502,20 +493,22 @@ class _DocumentSheetState extends ConsumerState<DocumentSheet> {
       setState(() => _error = '请选到期日');
       return;
     }
-    unawaited(_addSub(
-      ref,
-      Subscription(
-        id: 0,
-        title: '${holder}的$_selectedDocType',
-        type: SubType.document,
-        calendar: Calendar.solar,
-        mode: TriggerMode.anchorMonthly,
-        anchorMonth: _expiryDate!.month,
-        anchorDay: _expiryDate!.day,
-        leadDays: _leadDays,
-        createdAt: DateTime.now(),
+    unawaited(
+      _addSub(
+        ref,
+        Subscription(
+          id: 0,
+          title: '$holder的$_selectedDocType',
+          type: SubType.document,
+          calendar: Calendar.solar,
+          mode: TriggerMode.anchorMonthly,
+          anchorMonth: _expiryDate!.month,
+          anchorDay: _expiryDate!.day,
+          leadDays: _leadDays,
+          createdAt: DateTime.now(),
+        ),
       ),
-    ));
+    );
     Navigator.pop(context);
   }
 }
@@ -566,10 +559,7 @@ class _HealthSheetState extends ConsumerState<HealthSheet> {
     ),
     (
       '监测',
-      [
-        ('血压监测', AppIcons.heartRate()),
-        ('血糖/血脂', AppIcons.electrocardiogram()),
-      ],
+      [('血压监测', AppIcons.heartRate()), ('血糖/血脂', AppIcons.electrocardiogram())],
     ),
     (
       '疫苗',
@@ -598,7 +588,8 @@ class _HealthSheetState extends ConsumerState<HealthSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final canSubmit = _whoController.text.trim().isNotEmpty &&
+    final canSubmit =
+        _whoController.text.trim().isNotEmpty &&
         _selectedProject != null &&
         _lastDate != null;
     return SheetScaffold(
@@ -718,19 +709,21 @@ class _HealthSheetState extends ConsumerState<HealthSheet> {
     final title = _selectedPreset != null
         ? '$_selectedPreset（$who）'
         : '$_selectedProject（$who）';
-    unawaited(_addSub(
-      ref,
-      Subscription(
-        id: 0,
-        title: title,
-        type: SubType.healthCheck,
-        calendar: Calendar.solar,
-        mode: TriggerMode.intervalDays,
-        intervalDays: _cycleDays,
-        leadDays: _leadDays,
-        createdAt: _lastDate!,
+    unawaited(
+      _addSub(
+        ref,
+        Subscription(
+          id: 0,
+          title: title,
+          type: SubType.healthCheck,
+          calendar: Calendar.solar,
+          mode: TriggerMode.intervalDays,
+          intervalDays: _cycleDays,
+          leadDays: _leadDays,
+          createdAt: _lastDate!,
+        ),
       ),
-    ));
+    );
     Navigator.pop(context);
   }
 }
@@ -780,13 +773,7 @@ class _VehicleSheetState extends ConsumerState<VehicleSheet> {
         ('冷却液', AppIcons.water()),
       ],
     ),
-    (
-      '轮胎',
-      [
-        ('轮胎换位', AppIcons.recordDisc()),
-        ('轮胎更换', AppIcons.recordDisc()),
-      ],
-    ),
+    ('轮胎', [('轮胎换位', AppIcons.recordDisc()), ('轮胎更换', AppIcons.recordDisc())]),
     (
       '美容',
       [
@@ -827,9 +814,12 @@ class _VehicleSheetState extends ConsumerState<VehicleSheet> {
   @override
   Widget build(BuildContext context) {
     final byTime = _condIndex == 0;
-    final canSubmit = _vehicleController.text.trim().isNotEmpty &&
+    final canSubmit =
+        _vehicleController.text.trim().isNotEmpty &&
         _selectedService != null &&
-        (byTime ? _lastDate != null : _mileageController.text.trim().isNotEmpty);
+        (byTime
+            ? _lastDate != null
+            : _mileageController.text.trim().isNotEmpty);
     return SheetScaffold(
       title: '添加车辆',
       actionDisabled: !canSubmit,
@@ -890,16 +880,16 @@ class _VehicleSheetState extends ConsumerState<VehicleSheet> {
           ),
           const Divider(height: 28, color: AppColors.borderSoft),
           if (byTime) ...[
-          SheetField(
-            label: '上次日期',
-            valueMuted: _lastDate == null,
-            value: SheetDateField(
-              date: _lastDate,
-              placeholder: '选择日期',
-              onTap: _pickDate,
-              onClear: () => setState(() => _lastDate = null),
+            SheetField(
+              label: '上次日期',
+              valueMuted: _lastDate == null,
+              value: SheetDateField(
+                date: _lastDate,
+                placeholder: '选择日期',
+                onTap: _pickDate,
+                onClear: () => setState(() => _lastDate = null),
+              ),
             ),
-          ),
             const Divider(height: 28, color: AppColors.borderSoft),
             SheetField(
               label: '周期',
@@ -921,7 +911,10 @@ class _VehicleSheetState extends ConsumerState<VehicleSheet> {
                   border: InputBorder.none,
                   isDense: true,
                 ),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
                 onChanged: (_) => setState(() {}),
               ),
             ),
@@ -989,19 +982,21 @@ class _VehicleSheetState extends ConsumerState<VehicleSheet> {
     }
     final body = _selectedPreset ?? _selectedService!;
     final title = '$body（$vehicle）';
-    unawaited(_addSub(
-      ref,
-      Subscription(
-        id: 0,
-        title: title,
-        type: SubType.vehicle,
-        calendar: Calendar.solar,
-        mode: TriggerMode.intervalDays,
-        intervalDays: intervalDays,
-        leadDays: _leadDays,
-        createdAt: createdAt,
+    unawaited(
+      _addSub(
+        ref,
+        Subscription(
+          id: 0,
+          title: title,
+          type: SubType.vehicle,
+          calendar: Calendar.solar,
+          mode: TriggerMode.intervalDays,
+          intervalDays: intervalDays,
+          leadDays: _leadDays,
+          createdAt: createdAt,
+        ),
       ),
-    ));
+    );
     Navigator.pop(context);
   }
 }

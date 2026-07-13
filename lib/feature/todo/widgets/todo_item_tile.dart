@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/designsystem/colors.dart';
 import '../../../data/models/todo_item.dart';
 
-/// 代办事项 tile —— 对照 mobile-android-todo.html .item
-/// 容器：flex 行 alignCenter gap12 padding14x16 minHeight64 底部 1px borderSoft
-/// check 22x22 圆形 2px border fg；完成态实心黑底+白勾
-/// 点 item 切换 done/未完成
 class TodoItemTile extends StatelessWidget {
   final TodoItem item;
   final DateTime today;
@@ -59,12 +55,15 @@ class TodoItemTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                   Row(
-                     children: [
+                  Row(
+                    children: [
                       if (item.tag != null) ...[
                         Container(
                           constraints: const BoxConstraints(maxHeight: 18),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(4),
@@ -132,10 +131,7 @@ class _CheckCircle extends StatelessWidget {
         color: checked ? AppColors.fg : null,
       ),
       child: checked
-          ? CustomPaint(
-              size: const Size(12, 12),
-              painter: _CheckPainter(),
-            )
+          ? CustomPaint(size: const Size(12, 12), painter: _CheckPainter())
           : null,
     );
   }
@@ -178,7 +174,12 @@ class _DueInfo {
 /// - 明天 → "截止 明天"（warn w500）
 /// - 2-7 天内 → "截止 M/D"（warn w500）
 /// - >7 天 → "截止 M/D"（muted，普通态）
-_DueInfo _dueInfo(TodoItem item, DateTime? dueDate, bool completed, DateTime today) {
+_DueInfo _dueInfo(
+  TodoItem item,
+  DateTime? dueDate,
+  bool completed,
+  DateTime today,
+) {
   if (completed) {
     return const _DueInfo('已完成', AppColors.muted, FontWeight.w400);
   }

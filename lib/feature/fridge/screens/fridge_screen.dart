@@ -102,9 +102,13 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
     ref.read(fridgeRepositoryProvider).restoreItem(item);
     // 通知调度：fire-and-forget，失败仅 log 不阻塞 UI
     // restoreItem 接收的 item 已有 id，直接重新调度过期提醒
-    unawaited(notificationScheduler
-        .scheduleFridgeExpiry(item)
-        .catchError((Object e) => debugPrint('[notify-error] fridge schedule: $e')));
+    unawaited(
+      notificationScheduler
+          .scheduleFridgeExpiry(item)
+          .catchError(
+            (Object e) => debugPrint('[notify-error] fridge schedule: $e'),
+          ),
+    );
   }
 
   @override
@@ -160,10 +164,7 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: AppColors.borderSoft,
-          ),
+          child: Container(height: 1, color: AppColors.borderSoft),
         ),
       ),
       body: StreamBuilder<List<FridgeItem>>(
@@ -248,7 +249,7 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
                     ],
                     // 库内组 - 外层 16px 水平 padding
                     if (okItems.isNotEmpty) ...[
-                      const _GroupHeader(title: '库内'                      ),
+                      const _GroupHeader(title: '库内'),
                       _buildFridgeList(okItems),
                     ],
                     // 空状态
@@ -359,7 +360,6 @@ class _ToastInfo {
 
 /// 食材聚合行 —— 单批完全复用 _FridgeRow；多批：聚合行 + 折叠/展开批次行
 ///
-/// 设计：`docs/designs/2026-07-09/fridge-aggregation-row-minimal.html`
 /// - 单批：`_FridgeRow` 原样渲染（零视觉差异）
 /// - 多批：弱 swatch + name + ×N pill + ›/‹ 箭头；右侧不加任何额外信息
 /// - 默认折叠；展开 200ms easeInOut
@@ -522,13 +522,12 @@ class _WarnBar extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDF3E1),
-        border: Border.all(color: const Color(0xFFF5D9B0), width: 1),
+        color: AppColors.expiringBg,
+        border: Border.all(color: AppColors.expiringBorder, width: 1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          // 8px 琥珀圆点
           Container(
             width: 8,
             height: 8,
@@ -705,7 +704,6 @@ class _GroupHeader extends StatelessWidget {
   }
 }
 
-/// 食材行 —— 含 swatch 色条 + name/qty/sub + tag chip + more 按钮
 class _FridgeRow extends StatelessWidget {
   final FridgeItem item;
   final _ItemStatus status;
@@ -721,23 +719,14 @@ class _FridgeRow extends StatelessWidget {
     required this.onMore,
   });
 
-  Color _statusColorForTag(String tag) {
-    switch (tag) {
-      case '蔬菜': return const Color(0xFF168A46);
-      case '水果': return const Color(0xFFB7791F);
-      case '肉类': return const Color(0xFFC53030);
-      default: return AppColors.muted;
-    }
-  }
+  static const _categoryStyles = <String, ({Color fg, Color bg})>{
+    '蔬菜': (fg: AppColors.success, bg: AppColors.catVegetable),
+    '水果': (fg: AppColors.warn, bg: AppColors.catFruit),
+    '肉类': (fg: AppColors.danger, bg: AppColors.catMeat),
+  };
 
-  Color _pastelForTag(String tag) {
-    switch (tag) {
-      case '蔬菜': return const Color(0xFFEDF3EC);
-      case '水果': return const Color(0xFFFBF3DB);
-      case '肉类': return const Color(0xFFFDEBEC);
-      default: return AppColors.surface;
-    }
-  }
+  ({Color fg, Color bg}) _categoryStyle(String tag) =>
+      _categoryStyles[tag] ?? (fg: AppColors.muted, bg: AppColors.surface);
 
   @override
   Widget build(BuildContext context) {
@@ -757,7 +746,9 @@ class _FridgeRow extends StatelessWidget {
           context: context,
           builder: (ctx) => AlertDialog(
             title: Text('移除「${item.name}」？'),
-            content: Text('${item.quantity} · ${item.expiryDate.year}/${item.expiryDate.month}/${item.expiryDate.day}'),
+            content: Text(
+              '${item.quantity} · ${item.expiryDate.year}/${item.expiryDate.month}/${item.expiryDate.day}',
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
@@ -782,7 +773,13 @@ class _FridgeRow extends StatelessWidget {
           children: [
             Icon(Icons.delete_outline, color: AppColors.bg),
             const SizedBox(width: 4),
-            Text('移除', style: TextStyle(color: AppColors.bg, fontWeight: FontWeight.w500)),
+            Text(
+              '移除',
+              style: TextStyle(
+                color: AppColors.bg,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),
@@ -801,7 +798,7 @@ class _FridgeRow extends StatelessWidget {
                 height: 20,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
-                  color: _pastelForTag(item.tag!),
+                  color: _categoryStyle(item.tag!).bg,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -809,7 +806,7 @@ class _FridgeRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: _statusColorForTag(item.tag!),
+                    color: _categoryStyle(item.tag!).fg,
                   ),
                 ),
               ),
@@ -869,10 +866,7 @@ class _FridgeRow extends StatelessWidget {
                       const SizedBox(width: 8),
                       const Text(
                         '·',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.muted,
-                        ),
+                        style: TextStyle(fontSize: 12, color: AppColors.muted),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -891,7 +885,8 @@ class _FridgeRow extends StatelessWidget {
                     _RestockProgressLine(
                       percent: item.remainingPercent,
                       threshold: item.restockThresholdPercent,
-                      showPercent: item.remainingPercent > item.restockThresholdPercent,
+                      showPercent:
+                          item.remainingPercent > item.restockThresholdPercent,
                     ),
                   ],
                 ],
@@ -921,7 +916,10 @@ class _FridgeRow extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: AppColors.danger,
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.surface, width: 2),
+                          border: Border.all(
+                            color: AppColors.surface,
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -937,7 +935,6 @@ class _FridgeRow extends StatelessWidget {
 
 /// 补货进度线 —— 追踪中食材下方 3px 细线
 ///
-/// 设计：`docs/designs/2026-07-09/fridge-restock-states.html`
 /// - percent > 阈值：muted 色 + 右侧 percent 文字
 /// - percent ≤ 阈值：danger 色 + 无文字
 class _RestockProgressLine extends StatelessWidget {
@@ -990,10 +987,7 @@ class _RestockProgressLine extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             '$percent%',
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.muted,
-            ),
+            style: const TextStyle(fontSize: 11, color: AppColors.muted),
           ),
         ],
       ],
@@ -1039,10 +1033,7 @@ class _Toast extends StatelessWidget {
           Expanded(
             child: Text(
               '已出库 · ${item.name}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.bg,
-              ),
+              style: const TextStyle(fontSize: 14, color: AppColors.bg),
             ),
           ),
           GestureDetector(
@@ -1218,7 +1209,8 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
         if (row == _Row.qty) {
           _qtyFocusNode.unfocus();
           // 自定义模式下用户没填，回退到默认「1 份」
-          if (_qtyMode == _QtyMode.custom && _qtyController.text.trim().isEmpty) {
+          if (_qtyMode == _QtyMode.custom &&
+              _qtyController.text.trim().isEmpty) {
             _qtyController.text = '1 份';
             _qtyMode = _QtyMode.preset;
           }
@@ -1305,7 +1297,9 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
     final current = await repo.getSettings();
     final currentTags = current.fridgeTags;
     if (!currentTags.contains(trimmed)) {
-      await repo.updateSettings(current.withFridgeTags([...currentTags, trimmed]));
+      await repo.updateSettings(
+        current.withFridgeTags([...currentTags, trimmed]),
+      );
     }
   }
 
@@ -1341,11 +1335,15 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
       );
       ref.read(fridgeRepositoryProvider).updateItem(updated).then((_) {
         // 通知重排：先取消旧通知，再按新过期日调度
-        unawaited(notificationScheduler
-            .cancelFridge(init.id)
-            .then((_) => notificationScheduler.scheduleFridgeExpiry(updated))
-            .catchError((Object e) =>
-                debugPrint('[notify-error] fridge reschedule: $e')));
+        unawaited(
+          notificationScheduler
+              .cancelFridge(init.id)
+              .then((_) => notificationScheduler.scheduleFridgeExpiry(updated))
+              .catchError(
+                (Object e) =>
+                    debugPrint('[notify-error] fridge reschedule: $e'),
+              ),
+        );
       });
       // ponytail: 编辑食材过期日不同步更新补货 todo 的 dueDate。
       // 升级路径：FridgeItem 加 linkedTodoId 字段，编辑时联动更新。
@@ -1365,10 +1363,13 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
 
     ref.read(fridgeRepositoryProvider).addItem(item).then((newId) {
       // 同时调度食材过期通知
-      unawaited(notificationScheduler
-          .scheduleFridgeExpiry(item.copyWith(id: newId))
-          .catchError((Object e) =>
-              debugPrint('[notify-error] fridge schedule: $e')));
+      unawaited(
+        notificationScheduler
+            .scheduleFridgeExpiry(item.copyWith(id: newId))
+            .catchError(
+              (Object e) => debugPrint('[notify-error] fridge schedule: $e'),
+            ),
+      );
     });
     Navigator.pop(context);
   }
@@ -1382,7 +1383,9 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
 
     return Padding(
       // 仅顶部 viewInsets.bottom 把整个 sheet 顶上去；左右 0 让 row 横到边缘
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1458,7 +1461,12 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
                     expandedChild: _TagEditor(
                       selectedTag: _selectedTag,
                       presets: _tagPresets,
-                      persistedTags: ref.watch(fridgeAppSettingsProvider).valueOrNull?.fridgeTags ?? [],
+                      persistedTags:
+                          ref
+                              .watch(fridgeAppSettingsProvider)
+                              .valueOrNull
+                              ?.fridgeTags ??
+                          [],
                       isEditingCustom: _isEditingCustomTag,
                       customTag: _customTag ?? '',
                       controller: _customTagController,
@@ -1503,9 +1511,7 @@ class _AddItemSheetState extends ConsumerState<_AddItemSheet> {
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 // 子 widget（私有）—— 全部 stateless，状态由 _AddItemSheetState 持有
-// ════════════════════════════════════════════════════════════════════════════
 
 /// 顶部 drag handle —— 复用视觉语言
 class _DragHandle extends StatelessWidget {
@@ -1576,8 +1582,10 @@ class _NavBar extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: canSubmit ? onSubmit : null,
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 child: Text(
                   actionLabel,
                   style: TextStyle(
@@ -1624,10 +1632,7 @@ class _FooterButton extends StatelessWidget {
             ),
             child: Text(
               isEdit ? '保存' : '入库',
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
           ),
         ),
@@ -1688,8 +1693,7 @@ class _FieldRow extends StatelessWidget {
                     _hasValue ? value : placeholder,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight:
-                          _hasValue ? FontWeight.w500 : FontWeight.w400,
+                      fontWeight: _hasValue ? FontWeight.w500 : FontWeight.w400,
                       color: _hasValue ? AppColors.fg : AppColors.muted,
                     ),
                     textAlign: TextAlign.right,
@@ -1828,8 +1832,10 @@ class _QtyEditor extends StatelessWidget {
                   ),
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 0,
+                    vertical: 10,
+                  ),
                 ),
                 style: const TextStyle(fontSize: 15, color: AppColors.fg),
               ),
@@ -1869,11 +1875,16 @@ class _TagEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final allTags = [...presets, ...persistedTags.where((t) => !presets.contains(t))];
+    final allTags = [
+      ...presets,
+      ...persistedTags.where((t) => !presets.contains(t)),
+    ];
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.borderSoft, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderSoft, width: 1),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1941,17 +1952,25 @@ Widget _customTagChip({
         GestureDetector(
           onTap: onSubmit,
           child: Container(
-            width: 24, height: 24,
-            decoration: BoxDecoration(color: AppColors.fg, shape: BoxShape.circle),
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: AppColors.fg,
+              shape: BoxShape.circle,
+            ),
             child: Icon(Icons.check, size: 14, color: AppColors.bg),
           ),
         ),
         GestureDetector(
           onTap: onCancel,
           child: Container(
-            width: 24, height: 24,
+            width: 24,
+            height: 24,
             alignment: Alignment.center,
-            child: Text('✕', style: TextStyle(color: AppColors.muted, fontSize: 12)),
+            child: Text(
+              '✕',
+              style: TextStyle(color: AppColors.muted, fontSize: 12),
+            ),
           ),
         ),
       ],
@@ -1961,7 +1980,6 @@ Widget _customTagChip({
 
 /// 补货追踪行展开 —— 开关 + 阈值 + 补货量 + 当前余量调整
 ///
-/// 设计：`docs/designs/2026-07-09/fridge-restock-edit-page.html`
 /// ponytail: 数量值编辑走单一 TextField（非 chip group），与设计稿 chip 行为有出入；
 /// 设计稿 chip 行为仅用 quantity preset（1 份/1 L/500 g），补货量更自由，
 /// TextField 更合适。这里用 TextField + hint 用 quantity 作为兜底。
@@ -2009,7 +2027,9 @@ class _RestockEditorState extends State<_RestockEditor> {
   void didUpdateWidget(covariant _RestockEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
     // 父级 prop 与控制器不一致时同步（chip 触发 reset 等场景）
-    final expected = widget.restockQty.isEmpty ? widget.quantity : widget.restockQty;
+    final expected = widget.restockQty.isEmpty
+        ? widget.quantity
+        : widget.restockQty;
     if (_restockQtyController.text != expected) {
       _restockQtyController.text = expected;
     }
@@ -2114,7 +2134,10 @@ class _RestockEditorState extends State<_RestockEditor> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
                 ),
               ),
             ),
@@ -2155,20 +2178,23 @@ class _RestockEditorState extends State<_RestockEditor> {
                 _FridgeChip(
                   label: '−10%',
                   isSelected: false,
-                  onTap: () =>
-                      widget.onRemainingChanged((remainingPercent - 10).clamp(0, 100)),
+                  onTap: () => widget.onRemainingChanged(
+                    (remainingPercent - 10).clamp(0, 100),
+                  ),
                 ),
                 _FridgeChip(
                   label: '−25%',
                   isSelected: false,
-                  onTap: () =>
-                      widget.onRemainingChanged((remainingPercent - 25).clamp(0, 100)),
+                  onTap: () => widget.onRemainingChanged(
+                    (remainingPercent - 25).clamp(0, 100),
+                  ),
                 ),
                 _FridgeChip(
                   label: '−50%',
                   isSelected: false,
-                  onTap: () =>
-                      widget.onRemainingChanged((remainingPercent - 50).clamp(0, 100)),
+                  onTap: () => widget.onRemainingChanged(
+                    (remainingPercent - 50).clamp(0, 100),
+                  ),
                 ),
                 _FridgeChip(
                   label: '用完',
@@ -2242,7 +2268,7 @@ class _DateEditor extends StatelessWidget {
   }
 }
 
-/// pill chip —— 30px 高（design doc 规格，与 subscription 的 PresetChip 36px 区分）
+/// pill chip —— 30px 高
 ///
 /// ponytail: `isCustom` (muted border) 与 `danger` (danger border + danger text) 是两个
 /// 独立的视觉修饰，互不冲突但都覆盖默认 border 色。
@@ -2290,10 +2316,7 @@ class _FridgeChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.fg : AppColors.bg,
-          border: Border.all(
-            color: borderColor,
-            width: 1,
-          ),
+          border: Border.all(color: borderColor, width: 1),
           borderRadius: BorderRadius.circular(999),
         ),
         alignment: Alignment.center,

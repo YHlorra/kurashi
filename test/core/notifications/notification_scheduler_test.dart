@@ -24,13 +24,24 @@ void main() {
     });
 
     test('scheduleTodoReminder skips completed items without throw', () async {
-      final completed = TodoItem(id: 1, title: 'done', dueDate: DateTime(2026, 7, 10), completed: true, createdAt: DateTime.now());
+      final completed = TodoItem(
+        id: 1,
+        title: 'done',
+        dueDate: DateTime(2026, 7, 10),
+        completed: true,
+        createdAt: DateTime.now(),
+      );
       await scheduler.scheduleTodoReminder(completed);
       // Should complete without throwing (no-op path)
     });
 
     test('scheduleTodoReminder skips items without dueDate', () async {
-      final noDue = TodoItem(id: 2, title: 'no-date', completed: false, createdAt: DateTime.now());
+      final noDue = TodoItem(
+        id: 2,
+        title: 'no-date',
+        completed: false,
+        createdAt: DateTime.now(),
+      );
       await scheduler.scheduleTodoReminder(noDue);
     });
   });

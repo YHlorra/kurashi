@@ -34,13 +34,13 @@ class Habit {
     TimeOfDay? reminderTime,
     int? reminderMinutes,
     required this.createdAt,
-  })  : assert(
-          reminderTime == null || reminderMinutes == null,
-          'reminderTime 与 reminderMinutes 不可同时指定',
-        ),
-        reminderMinutes = reminderTime != null
-            ? reminderTime.hour * 60 + reminderTime.minute
-            : reminderMinutes;
+  }) : assert(
+         reminderTime == null || reminderMinutes == null,
+         'reminderTime 与 reminderMinutes 不可同时指定',
+       ),
+       reminderMinutes = reminderTime != null
+           ? reminderTime.hour * 60 + reminderTime.minute
+           : reminderMinutes;
 
   /// 运行时计算属性 —— UI 通过 habit.reminderTime 读取 TimeOfDay?，不被 Isar 存储。
   @ignore

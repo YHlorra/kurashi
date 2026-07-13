@@ -21,22 +21,18 @@ import 'schemas.dart';
 final isarProvider = FutureProvider<Isar>((ref) async {
   final dir = await getApplicationDocumentsDirectory();
   try {
-    return Isar.open(
-      schemas: schemas,
-      directory: dir.path,
-      inspector: true,
-    );
+    return Isar.open(schemas: schemas, directory: dir.path, inspector: true);
   } catch (e) {
     // Schema mismatch — delete and recreate DB ponytail: 首次 schema 改动降级
     final dbName = 'default.isar';
     final dbFile = File('${dir.path}/$dbName');
     final lockFile = File('${dir.path}/$dbName.lock');
-    try { if (dbFile.existsSync()) dbFile.deleteSync(); } catch (_) {}
-    try { if (lockFile.existsSync()) lockFile.deleteSync(); } catch (_) {}
-    return Isar.open(
-      schemas: schemas,
-      directory: dir.path,
-      inspector: true,
-    );
+    try {
+      if (dbFile.existsSync()) dbFile.deleteSync();
+    } catch (_) {}
+    try {
+      if (lockFile.existsSync()) lockFile.deleteSync();
+    } catch (_) {}
+    return Isar.open(schemas: schemas, directory: dir.path, inspector: true);
   }
 });

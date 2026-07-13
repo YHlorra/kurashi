@@ -53,12 +53,12 @@ class IsarHabitRepository implements HabitRepository {
     final dayStart = DateTime(date.year, date.month, date.day);
     final dayEnd = dayStart.add(const Duration(days: 1));
     final exists = isar.habitCheckins
-            .where()
-            .habitIdEqualTo(habitId)
-            .dateGreaterThanOrEqualTo(dayStart)
-            .dateLessThan(dayEnd)
-            .findAll()
-            .isNotEmpty;
+        .where()
+        .habitIdEqualTo(habitId)
+        .dateGreaterThanOrEqualTo(dayStart)
+        .dateLessThan(dayEnd)
+        .findAll()
+        .isNotEmpty;
     if (exists) return;
 
     final id = isar.habitCheckins.autoIncrement();
@@ -91,11 +91,13 @@ class IsarHabitRepository implements HabitRepository {
     final weekEnd = weekStart.add(const Duration(days: 7));
     return isar.habitCheckins
         .watchLazy(fireImmediately: true)
-        .map((_) => isar.habitCheckins
-            .where()
-            .habitIdEqualTo(habitId)
-            .dateGreaterThanOrEqualTo(weekStart)
-            .dateLessThan(weekEnd)
-            .findAll());
+        .map(
+          (_) => isar.habitCheckins
+              .where()
+              .habitIdEqualTo(habitId)
+              .dateGreaterThanOrEqualTo(weekStart)
+              .dateLessThan(weekEnd)
+              .findAll(),
+        );
   }
 }

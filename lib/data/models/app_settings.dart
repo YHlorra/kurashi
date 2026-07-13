@@ -43,8 +43,10 @@ class AppSettings {
   }) {
     return AppSettings(
       id: id ?? this.id,
-      fridgeLogRetentionDays: fridgeLogRetentionDays ?? this.fridgeLogRetentionDays,
-      fridgeLogLastCleanupAt: fridgeLogLastCleanupAt ?? this.fridgeLogLastCleanupAt,
+      fridgeLogRetentionDays:
+          fridgeLogRetentionDays ?? this.fridgeLogRetentionDays,
+      fridgeLogLastCleanupAt:
+          fridgeLogLastCleanupAt ?? this.fridgeLogLastCleanupAt,
       settingsJson: settingsJson ?? this.settingsJson,
     );
   }
@@ -57,7 +59,9 @@ class AppSettings {
   /// - `settingsJson` 为 null 或不含 `userTags` 键 → 返回 5 项预设。
   /// - 否则返回 JSON 数组解码结果。
   List<String> get userTags {
-    if (settingsJson == null || settingsJson!.isEmpty) return List<String>.from(_kDefaultTags);
+    if (settingsJson == null || settingsJson!.isEmpty) {
+      return List<String>.from(_kDefaultTags);
+    }
     try {
       final m = jsonDecode(settingsJson!) as Map<String, dynamic>;
       final raw = m['userTags'];

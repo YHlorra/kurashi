@@ -8,7 +8,7 @@ import '../subscription_repository.dart';
 ///
 /// setActiveByType 在 active=true 且 type 为节日（cnFestival/westernFestival）时，
 /// 调用 festival_presets 批量 upsert 该 type 的预设 Subscription；其余情况仅批量
-  /// 切换 active flag
+/// 切换 active flag
 ///
 /// INVARIANT（2026-07-09）：isar_plus 的 put/delete 通过
 /// `getWriteTxn(consume: true, ...)` 依赖当前已有的写事务——**不会自己开启**。
@@ -62,8 +62,7 @@ class IsarSubscriptionRepository implements SubscriptionRepository {
       }
       // active=true 且为节日 type 时，按预设表批量 upsert 节日 Subscription
       if (active &&
-          (type == SubType.cnFestival ||
-              type == SubType.westernFestival)) {
+          (type == SubType.cnFestival || type == SubType.westernFestival)) {
         final presets = presetsByType(type);
         for (final preset in presets) {
           // upsert 策略：同 type + 同 title 视为同一条记录

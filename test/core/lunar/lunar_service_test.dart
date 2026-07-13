@@ -9,9 +9,15 @@ void main() {
   group('LunarService.nextTriggerDate - user behavior', () {
     test('user sets National Day reminder, sees it this year', () {
       final sub = Subscription(
-        title: 'National Day', type: SubType.cnFestival, calendar: Calendar.solar,
-        mode: TriggerMode.anchorMonthly, anchorMonth: 10, anchorDay: 1,
-        leadDays: 0, active: true, createdAt: DateTime(2026, 1, 1),
+        title: 'National Day',
+        type: SubType.cnFestival,
+        calendar: Calendar.solar,
+        mode: TriggerMode.anchorMonthly,
+        anchorMonth: 10,
+        anchorDay: 1,
+        leadDays: 0,
+        active: true,
+        createdAt: DateTime(2026, 1, 1),
       );
       final result = service.nextTriggerDate(sub, today: DateTime(2026, 7, 2));
       expect(result, DateTime(2026, 10, 1));
@@ -19,19 +25,34 @@ void main() {
 
     test('user sets New Year reminder in December, sees it next year', () {
       final sub = Subscription(
-        title: 'New Year', type: SubType.cnFestival, calendar: Calendar.solar,
-        mode: TriggerMode.anchorMonthly, anchorMonth: 1, anchorDay: 1,
-        leadDays: 0, active: true, createdAt: DateTime(2026, 1, 1),
+        title: 'New Year',
+        type: SubType.cnFestival,
+        calendar: Calendar.solar,
+        mode: TriggerMode.anchorMonthly,
+        anchorMonth: 1,
+        anchorDay: 1,
+        leadDays: 0,
+        active: true,
+        createdAt: DateTime(2026, 1, 1),
       );
-      final result = service.nextTriggerDate(sub, today: DateTime(2026, 12, 31));
+      final result = service.nextTriggerDate(
+        sub,
+        today: DateTime(2026, 12, 31),
+      );
       expect(result, DateTime(2027, 1, 1));
     });
 
     test('user on the exact trigger date sees next years date', () {
       final sub = Subscription(
-        title: 'National Day', type: SubType.cnFestival, calendar: Calendar.solar,
-        mode: TriggerMode.anchorMonthly, anchorMonth: 10, anchorDay: 1,
-        leadDays: 0, active: true, createdAt: DateTime(2026, 1, 1),
+        title: 'National Day',
+        type: SubType.cnFestival,
+        calendar: Calendar.solar,
+        mode: TriggerMode.anchorMonthly,
+        anchorMonth: 10,
+        anchorDay: 1,
+        leadDays: 0,
+        active: true,
+        createdAt: DateTime(2026, 1, 1),
       );
       final result = service.nextTriggerDate(sub, today: DateTime(2026, 10, 1));
       expect(result, DateTime(2027, 10, 1));
@@ -39,9 +60,15 @@ void main() {
 
     test('user sets Spring Festival, gets next lunar new year', () {
       final sub = Subscription(
-        title: 'Spring Festival', type: SubType.cnFestival, calendar: Calendar.lunar,
-        mode: TriggerMode.anchorMonthly, anchorMonth: 1, anchorDay: 1,
-        leadDays: 0, active: true, createdAt: DateTime(2026, 1, 1),
+        title: 'Spring Festival',
+        type: SubType.cnFestival,
+        calendar: Calendar.lunar,
+        mode: TriggerMode.anchorMonthly,
+        anchorMonth: 1,
+        anchorDay: 1,
+        leadDays: 0,
+        active: true,
+        createdAt: DateTime(2026, 1, 1),
       );
       final result = service.nextTriggerDate(sub, today: DateTime(2026, 7, 2));
       expect(result.year, 2027);
@@ -50,9 +77,14 @@ void main() {
 
     test('user sets 30-day rolling reminder, gets next future date', () {
       final sub = Subscription(
-        title: 'Water filter', type: SubType.homeMaintenance, calendar: Calendar.solar,
-        mode: TriggerMode.intervalDays, intervalDays: 30, leadDays: 7,
-        active: true, createdAt: DateTime(2026, 6, 1),
+        title: 'Water filter',
+        type: SubType.homeMaintenance,
+        calendar: Calendar.solar,
+        mode: TriggerMode.intervalDays,
+        intervalDays: 30,
+        leadDays: 7,
+        active: true,
+        createdAt: DateTime(2026, 6, 1),
       );
       final result = service.nextTriggerDate(sub, today: DateTime(2026, 7, 2));
       expect(result, DateTime(2026, 7, 31));
@@ -60,7 +92,10 @@ void main() {
 
     test('Qingming falls in April 4-6', () {
       for (int year = 2024; year <= 2028; year++) {
-        final date = service.nextSpecialFestivalDate(SpecialFestivalType.qingming, year);
+        final date = service.nextSpecialFestivalDate(
+          SpecialFestivalType.qingming,
+          year,
+        );
         expect(date.year, year);
         expect(date.month, 4);
         expect(date.day, inInclusiveRange(4, 6));
@@ -69,7 +104,10 @@ void main() {
 
     test("Mother's Day = 2nd Sunday of May", () {
       for (int year = 2024; year <= 2028; year++) {
-        final date = service.nextSpecialFestivalDate(SpecialFestivalType.mothersDay, year);
+        final date = service.nextSpecialFestivalDate(
+          SpecialFestivalType.mothersDay,
+          year,
+        );
         expect(date.weekday, DateTime.sunday);
         expect(date.day, inInclusiveRange(8, 14));
       }
@@ -92,9 +130,15 @@ void main() {
   group('LunarService.daysUntil - behavior', () {
     test('National Day from July 2 = 91 days', () {
       final sub = Subscription(
-        title: 'National Day', type: SubType.cnFestival, calendar: Calendar.solar,
-        mode: TriggerMode.anchorMonthly, anchorMonth: 10, anchorDay: 1,
-        leadDays: 0, active: true, createdAt: DateTime(2026, 1, 1),
+        title: 'National Day',
+        type: SubType.cnFestival,
+        calendar: Calendar.solar,
+        mode: TriggerMode.anchorMonthly,
+        anchorMonth: 10,
+        anchorDay: 1,
+        leadDays: 0,
+        active: true,
+        createdAt: DateTime(2026, 1, 1),
       );
       expect(service.daysUntil(sub, today: DateTime(2026, 7, 2)), 91);
     });
