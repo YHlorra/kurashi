@@ -53,6 +53,11 @@ class NotificationInitializer {
         >();
     if (androidPlugin != null) {
       await androidPlugin.requestNotificationsPermission();
+      // Android 12+ 精确闹钟权限（SCHEDULE_EXACT_ALARM）。
+      // 未授权时调度降级为 inexactAllowWhileIdle（0-15 分钟延迟），授权后用
+      // exactAllowWhileIdle（精确，跨 Doze）。requestExactAlarmsPermission 内部
+      // 先检查 canScheduleExactAlarms，已授权则直接返回不弹设置页。
+      await androidPlugin.requestExactAlarmsPermission();
     }
 
     // 3. workmanager 初始化 + 注册每日凌晨 03:00 重算任务（Task 14）。

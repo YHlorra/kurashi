@@ -199,9 +199,22 @@ class _TodoScreenState extends ConsumerState<TodoScreen> {
   ) {
     final futureGroups = <DateTime, List<AgendaItem>>{};
     final todayItems = <AgendaItem>[];
+    final completedTodayItems = <AgendaItem>[];
     final today = DateTime(now.year, now.month, now.day);
 
     for (final ai in items) {
+      // 内联宽限期：今日完成的 todo 不参与 dueDate 分组，
+      // 直接归入「今天」分组底部（即使其 dueDate 在未来，也不漏进未来分组）。
+      if (ai is TodoAgendaItem) {
+        final item = ai.item;
+        if (item.completed &&
+            item.completedAt != null &&
+            DateUtils.isSameDay(item.completedAt, today)) {
+          completedTodayItems.add(ai);
+          continue;
+        }
+      }
+
       // todo: dueDate · habit: 无（每日）· sub: 下次触发日
       final dueDate = switch (ai) {
         TodoAgendaItem(:final item) => item.dueDate,
@@ -225,10 +238,13 @@ class _TodoScreenState extends ConsumerState<TodoScreen> {
 
     final widgets = <Widget>[];
 
-    // 今天分组
-    if (todayItems.isNotEmpty) {
+    // 今天分组（普通项在前，今日完成项置底）
+    if (todayItems.isNotEmpty || completedTodayItems.isNotEmpty) {
       widgets.add(_DateHeader(date: today, today: now));
       for (final ai in todayItems) {
+        widgets.add(_buildTile(ai, now, weekStart));
+      }
+      for (final ai in completedTodayItems) {
         widgets.add(_buildTile(ai, now, weekStart));
       }
     }

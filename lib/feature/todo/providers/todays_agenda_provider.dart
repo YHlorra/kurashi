@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/lunar/lunar_service.dart';
@@ -53,7 +54,7 @@ final todaysAgendaProvider = StreamProvider<List<AgendaItem>>((ref) {
   void emit() {
     // Wait until all three streams have emitted at least once.
     if (!todoReady || !habitReady || !subReady) return;
-    controller.add(_buildAgenda(todos, habits, subs, today: DateTime.now()));
+    controller.add(buildAgenda(todos, habits, subs, today: DateTime.now()));
   }
 
   final s1 = todoRepo.watchAll().listen((v) {
@@ -129,9 +130,12 @@ final completedTodosProvider = StreamProvider<List<TodoItem>>((ref) {
 /// 节日/账单/生日"消失"—— 现按 active + daysUntil 注入，订阅一项就显示一项。
 /// 上限 365 天是为了让"今年 + 明年元宵"这种隔年节日也能一并呈现。
 ///
-/// 阶段 2：过滤在函数顶部，提前剔除 completed todo —— `_agendaOrder` 中
-/// (todo, 3) "整理上周复盘" 已完成，会被自然忽略；catch-all 也不会重添加。
-List<AgendaItem> _buildAgenda(
+/// 内联宽限期（grace period）：completed todo 不立即消失，而是以划线灰态
+/// 内联保留在「今日」主列表底部，直到跨过 completedAt 的次日（midnight 后）
+/// 才从主列表移除、仅存于「已完成」视图（可恢复、绝不删除）。
+/// 判定同日复用 Flutter SDK 的 [DateUtils.isSameDay]（对 null 直接返回 false，
+/// 正好等价于「completedAt == null → 不保留」规则）。
+List<AgendaItem> buildAgenda(
   List<TodoItem> todos,
   List<Habit> habits,
   List<Subscription> subs, {
@@ -140,8 +144,13 @@ List<AgendaItem> _buildAgenda(
   final now = today ?? DateTime.now();
   final result = <AgendaItem>[];
 
-  // 阶段 2：提前过滤掉已完成 todo —— 不再出现在今日视图。
+  // active todo（未完成）—— 主列表的主体。
   final activeTodos = todos.where((t) => !t.completed).toList();
+  // 内联宽限期：仅"今天完成"的 todo 仍内联保留（置底）；
+  // completedAt == null 的遗留数据视为"非当日完成" → 不保留。
+  final completedTodayTodos = todos
+      .where((t) => t.completed && DateUtils.isSameDay(t.completedAt, now))
+      .toList();
 
   // 1. 追加所有 active 代办与习惯（按创建顺序）
   for (final t in activeTodos) {
@@ -166,6 +175,11 @@ List<AgendaItem> _buildAgenda(
   );
   for (final s in anchorSubs) {
     result.add(SubAgendaItem(s));
+  }
+
+  // 内联宽限期：今日完成项置底（active / habits / subs 之后）。
+  for (final t in completedTodayTodos) {
+    result.add(TodoAgendaItem(t));
   }
 
   return result;
