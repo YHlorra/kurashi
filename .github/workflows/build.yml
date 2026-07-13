@@ -1,10 +1,28 @@
-name: Build & Test
+name: Build & Release
 
+# 每次 push 到 main / master / develop 都跑测试与构建；
+# push 到 main / master 时额外产出可直接下载安装的 GitHub Release APK。
 on:
   push:
     branches: [main, master, develop]
   pull_request:
     branches: [main, master]
+  workflow_dispatch: {}
+
+# 顶层的读权限；发布用的写权限在 release job 内单独声明。
+permissions:
+  contents: read
+
+# 同一分支的多次 push 互相取消，避免排队堆积。
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # 与本地开发机保持一致：Flutter 3.44.4 自带 Dart 3.12.2。
+  # 正是这里把 CI 的 Dart 从 3.11.1 升到 3.12.2，修掉
+  # "Because kurashi requires SDK version ^3.12.2, version solving failed"。
+  FLUTTER_VERSION: "3.44.4"
 
 jobs:
   test:
@@ -16,7 +34,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.41.4"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -33,10 +51,16 @@ jobs:
           path: coverage/lcov.info
           retention-days: 7
 
-  build-apk:
-    name: Build Release APK
+  build-and-release:
+    name: Build & Publish Release APK
     runs-on: ubuntu-latest
     needs: test
+    # 只有 push 到 main / master 才发 release；develop 与 PR 不发。
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -48,7 +72,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.41.4"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -59,15 +83,32 @@ jobs:
 
       - name: Rename APK
         run: |
-          mkdir -p output
-          cp build/app/outputs/flutter-apk/app-release.apk \
-             output/kurashi-${{ github.sha }}.apk
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             build/app/outputs/flutter-apk/kurashi-${{ github.sha }}.apk
 
-      - uses: actions/upload-artifact@v4
+      # 兜底留存 30 天，避免 release 被清理后无处可下。
+      - name: Upload APK artifact (backup)
+        uses: actions/upload-artifact@v4
         with:
           name: kurashi-release-apk
-          path: output/kurashi-*.apk
+          path: build/app/outputs/flutter-apk/kurashi-*.apk
           retention-days: 30
+
+      # 滚动 release：固定 tag=latest，每次 push 覆盖更新，
+      # 得到稳定可下载地址，无需手工打 tag。
+      - name: Publish rolling release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: latest
+          name: "Latest build (${{ github.sha }})"
+          body: |
+            Automated release build from `${{ github.sha }}` on `${{ github.ref_name }}`.
+            Built with Flutter ${{ env.FLUTTER_VERSION }} (Dart 3.12.2).
+          generateReleaseNotes: true
+          artifacts: "build/app/outputs/flutter-apk/kurashi-*.apk"
+          allowUpdates: true
+          removeArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   build-debug:
     name: Build Debug APK (PR)
@@ -85,7 +126,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.41.4"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
