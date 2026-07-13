@@ -35,6 +35,12 @@ class IsarHabitRepository implements HabitRepository {
   }
 
   @override
+  Future<void> updateHabit(Habit habit) async {
+    // Isar put 为 upsert：存在 id 则更新，否则插入。不触碰打卡记录。
+    isar.write((isar) => isar.habits.put(habit));
+  }
+
+  @override
   Future<void> deleteHabit(int id) async {
     // 级联删除该习惯的打卡记录
     isar.write((isar) {

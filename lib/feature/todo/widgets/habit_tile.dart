@@ -12,12 +12,14 @@ class HabitTile extends ConsumerWidget {
   final Habit habit;
   final DateTime today;
   final DateTime weekStart;
+  final VoidCallback onEdit;
 
   const HabitTile({
     super.key,
     required this.habit,
     required this.today,
     required this.weekStart,
+    required this.onEdit,
   });
 
   @override
@@ -51,12 +53,14 @@ class HabitTile extends ConsumerWidget {
               // ring
               _HabitRing(n: n, m: m, color: ringColor),
               const SizedBox(width: 12),
-              // body
+              // body：点击打开编辑（打卡按钮保持独立切换）
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                child: InkWell(
+                  onTap: onEdit,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                     Text(
                       habit.title,
                       style: const TextStyle(
@@ -101,6 +105,7 @@ class HabitTile extends ConsumerWidget {
                       ],
                     ),
                   ],
+                ),
                 ),
               ),
               // checkin 按钮
@@ -155,7 +160,8 @@ Color _ringColor(int n, int m) {
   return AppColors.success;
 }
 
-/// 环形进度组件 —— 48x48，背景环 + 前景环 + 中央 N/M 文字
+/// 环形进度组件 —— 22x22，与 TodoItemTile 的 _CheckCircle 同尺寸。
+/// 背景环 + 前景环，不显示中央数字（频次已在副标题展示）。
 class _HabitRing extends StatelessWidget {
   final int n;
   final int m;
@@ -166,35 +172,15 @@ class _HabitRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = m == 0 ? 0.0 : (n / m).clamp(0.0, 1.0);
-    return SizedBox(
-      width: 48,
-      height: 48,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: const Size(48, 48),
-            painter: _RingPainter(progress: progress, color: color),
-          ),
-          Text(
-            '$n/$m',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'JetBrainsMono',
-              letterSpacing: 0.24,
-              color: AppColors.fg,
-            ),
-          ),
-        ],
-      ),
+    return CustomPaint(
+      size: const Size(22, 22),
+      painter: _RingPainter(progress: progress, color: color),
     );
   }
 }
 
 /// 环形进度绘制器
-/// 等价 SVG：circle r=20，dasharray=125.6，dashoffset=125.6*(1-progress)
-/// 背景环 stroke #EEEEEE width 4；前景环 stroke=指定色 width 4 round cap，旋转 -90deg
+/// 22x22 画布，2px 描边；背景环 #EEEEEE，前景环从顶部顺时针扫到进度。
 class _RingPainter extends CustomPainter {
   final double progress;
   final Color color;
@@ -204,17 +190,16 @@ class _RingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = 20.0; // SVG r=20
+    final radius = 10.0; // 22px 画布，2px stroke，外径 22，内径 18
 
     // 背景环
     canvas.drawCircle(
       center,
       radius,
       Paint()
-        ..color = AppColors
-            .surfaceWarm // #EEEEEE
+        ..color = AppColors.surfaceWarm
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 4,
+        ..strokeWidth = 2,
     );
 
     // 前景环：从顶部（-90deg）顺时针
@@ -222,13 +207,13 @@ class _RingPainter extends CustomPainter {
       final rect = Rect.fromCircle(center: center, radius: radius);
       canvas.drawArc(
         rect,
-        -math.pi / 2, // 起始角度：顶部
-        2 * math.pi * progress.clamp(0.0, 1.0), // 扫描角度
+        -math.pi / 2,
+        2 * math.pi * progress.clamp(0.0, 1.0),
         false,
         Paint()
           ..color = color
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 4
+          ..strokeWidth = 2
           ..strokeCap = StrokeCap.round,
       );
     }

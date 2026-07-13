@@ -7,12 +7,14 @@ class TodoItemTile extends StatelessWidget {
   final TodoItem item;
   final DateTime today;
   final VoidCallback onToggle;
+  final VoidCallback onEdit;
 
   const TodoItemTile({
     super.key,
     required this.item,
     required this.today,
     required this.onToggle,
+    required this.onEdit,
   });
 
   @override
@@ -20,25 +22,36 @@ class TodoItemTile extends StatelessWidget {
     final completed = item.completed;
     final dueInfo = _dueInfo(item, item.dueDate, completed, today);
 
-    return InkWell(
-      onTap: onToggle,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 64),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: const BoxDecoration(
-          color: AppColors.bg,
-          border: Border(
-            bottom: BorderSide(color: AppColors.borderSoft, width: 1),
-          ),
+    // 交互范式（对齐 Apple Reminders / Google Tasks / Microsoft To Do）：
+    // 圆圈 = 切换完成；整行文字 = 打开编辑。两者各自独立可点击。
+    return Container(
+      constraints: const BoxConstraints(minHeight: 64),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: const BoxDecoration(
+        color: AppColors.bg,
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderSoft, width: 1),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // check 圆
-            _CheckCircle(checked: completed),
-            const SizedBox(width: 12),
-            // body
-            Expanded(
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // check 圆：点击切换完成
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onToggle,
+              customBorder: const CircleBorder(),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: _CheckCircle(checked: completed),
+              ),
+            ),
+          ),
+          // body：点击打开编辑
+          Expanded(
+            child: InkWell(
+              onTap: onEdit,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -108,8 +121,8 @@ class TodoItemTile extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

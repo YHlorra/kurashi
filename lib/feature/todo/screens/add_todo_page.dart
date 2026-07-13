@@ -12,7 +12,15 @@ import '../../../data/models/todo_item.dart';
 import '../../../data/repositories/providers.dart';
 
 class AddTodoPage extends ConsumerStatefulWidget {
-  const AddTodoPage({super.key});
+  /// 编辑态：传入需编辑的待办或习惯（二者互斥）；均为 null 时为新建。
+  final TodoItem? editTodo;
+  final Habit? editHabit;
+
+  const AddTodoPage({super.key, this.editTodo, this.editHabit})
+      : assert(
+          editTodo == null || editHabit == null,
+          'editTodo 与 editHabit 不可同时指定',
+        );
 
   @override
   ConsumerState<AddTodoPage> createState() => _AddTodoPageState();
@@ -39,6 +47,29 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
   @override
   void initState() {
     super.initState();
+    final editTodo = widget.editTodo;
+    final editHabit = widget.editHabit;
+    // 编辑态：用已有数据预填表单
+    if (editTodo != null) {
+      _type = 0;
+      _descController.text = editTodo.title;
+      _selectedTag = editTodo.tag;
+      _dueDate = editTodo.dueDate;
+      _enableDueTime = editTodo.dueTimeMinutes != null;
+      _dueTime = editTodo.dueTimeMinutes != null
+          ? TimeOfDay(
+              hour: editTodo.dueTimeMinutes! ~/ 60,
+              minute: editTodo.dueTimeMinutes! % 60,
+            )
+          : null;
+    } else if (editHabit != null) {
+      _type = 1;
+      _descController.text = editHabit.title;
+      _selectedTag = editHabit.tag;
+      _frequency = editHabit.frequencyPerWeek;
+      _enableReminder = editHabit.reminderMinutes != null;
+      _reminderTime = editHabit.reminderTime;
+    }
     _loadTags();
     _descController.addListener(_onDescChanged);
   }
@@ -146,6 +177,8 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
   }
 
   Future<void> _submit() async {
+    final editTodo = widget.editTodo;
+    final editHabit = widget.editHabit;
     final title = _descController.text.trim();
     if (title.isEmpty) {
       setState(() => _error = '请填写描述');
@@ -158,41 +191,79 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
     try {
       if (_type == 0) {
         final item = TodoItem(
+          id: editTodo?.id ?? 0,
           title: title,
           tag: _selectedTag,
           dueDate: _dueDate,
           dueTimeMinutes: _enableDueTime && _dueTime != null
               ? _dueTime!.hour * 60 + _dueTime!.minute
               : null,
-          createdAt: DateTime.now(),
+          completed: editTodo?.completed ?? false,
+          completedAt: editTodo?.completedAt,
+          createdAt: editTodo?.createdAt ?? DateTime.now(),
         );
-        final id = await ref.read(todoRepositoryProvider).addTodo(item);
-        if (_dueDate != null) {
-          unawaited(
-            notificationScheduler
-                .scheduleTodoReminder(item.copyWith(id: id))
-                .catchError(
-                  (Object e) => debugPrint('[notify-error] todo schedule: $e'),
-                ),
-          );
+        if (editTodo != null) {
+          // 编辑态：更新 + 重新调度提醒（先取消旧通知，再按新时间排程）
+          await ref.read(todoRepositoryProvider).updateTodo(item);
+          await notificationScheduler.cancelTodo(item.id);
+          if (_dueDate != null) {
+            unawaited(
+              notificationScheduler
+                  .scheduleTodoReminder(item)
+                  .catchError(
+                    (Object e) =>
+                        debugPrint('[notify-error] todo schedule: $e'),
+                  ),
+            );
+          }
+        } else {
+          final id = await ref.read(todoRepositoryProvider).addTodo(item);
+          if (_dueDate != null) {
+            unawaited(
+              notificationScheduler
+                  .scheduleTodoReminder(item.copyWith(id: id))
+                  .catchError(
+                    (Object e) =>
+                        debugPrint('[notify-error] todo schedule: $e'),
+                  ),
+            );
+          }
         }
       } else {
         final habit = Habit(
+          id: editHabit?.id ?? 0,
           title: title,
           tag: _selectedTag,
           frequencyPerWeek: _frequency,
           reminderTime: _enableReminder ? _reminderTime : null,
-          createdAt: DateTime.now(),
+          createdAt: editHabit?.createdAt ?? DateTime.now(),
         );
-        final id = await ref.read(habitRepositoryProvider).addHabit(habit);
-        if (_enableReminder && _reminderTime != null) {
-          unawaited(
-            notificationScheduler
-                .scheduleHabitReminder(habit.copyWith(id: id))
-                .catchError(
-                  (Object e) => debugPrint('[notify-error] habit schedule: $e'),
-                ),
-          );
+        if (editHabit != null) {
+          // 编辑态：更新 + 重新调度提醒
+          await ref.read(habitRepositoryProvider).updateHabit(habit);
+          await notificationScheduler.cancelHabit(habit.id);
+          if (_enableReminder && _reminderTime != null) {
+            unawaited(
+              notificationScheduler
+                  .scheduleHabitReminder(habit)
+                  .catchError(
+                    (Object e) =>
+                        debugPrint('[notify-error] habit schedule: $e'),
+                  ),
+            );
+          }
+        } else {
+          final id = await ref.read(habitRepositoryProvider).addHabit(habit);
+          if (_enableReminder && _reminderTime != null) {
+            unawaited(
+              notificationScheduler
+                  .scheduleHabitReminder(habit.copyWith(id: id))
+                  .catchError(
+                    (Object e) =>
+                        debugPrint('[notify-error] habit schedule: $e'),
+                  ),
+            );
+          }
         }
       }
       if (mounted) Navigator.pop(context);
@@ -204,11 +275,16 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
   @override
   Widget build(BuildContext context) {
     final isTodo = _type == 0;
+    final editTodo = widget.editTodo;
+    final editHabit = widget.editHabit;
+    final isEditing = editTodo != null || editHabit != null;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: FormAppBar(
-        title: '添加待办',
+        title: editHabit != null
+            ? '编辑习惯'
+            : (editTodo != null ? '编辑待办' : '添加待办'),
         onAction: _submit,
         actionEnabled: _canSubmit,
       ),
@@ -222,7 +298,7 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
             const SizedBox(height: 8),
             TextField(
               controller: _descController,
-              autofocus: true,
+              autofocus: !isEditing,
               decoration: const InputDecoration(
                 hintText: '如：买牛奶 / 写报告',
                 border: InputBorder.none,
@@ -263,7 +339,9 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
             SegmentedControl<String>(
               options: const ['todo', 'habit'],
               selected: _type == 0 ? 'todo' : 'habit',
-              onChanged: (v) => setState(() => _type = v == 'todo' ? 0 : 1),
+              onChanged: isEditing
+                  ? (_) {}
+                  : (v) => setState(() => _type = v == 'todo' ? 0 : 1),
               labels: const ['代办', '习惯'],
             ),
             const SizedBox(height: 20),

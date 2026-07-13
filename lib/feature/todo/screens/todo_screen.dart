@@ -9,6 +9,7 @@ import '../../../core/designsystem/colors.dart';
 import '../../../core/lunar/lunar_service.dart';
 import '../../../core/notifications/notification_scheduler.dart';
 import '../../../data/models/todo_item.dart';
+import '../../../data/models/habit.dart';
 import '../../../data/repositories/providers.dart';
 import '../../todo/providers/todays_agenda_provider.dart';
 import '../../todo/widgets/habit_tile.dart';
@@ -156,14 +157,32 @@ class _TodoScreenState extends ConsumerState<TodoScreen> {
         item: item,
         today: today,
         onToggle: () => toggleTodoWithNotifications(ref, item),
+        onEdit: () => _openEditTodo(item),
       ),
       HabitAgendaItem(:final habit) => HabitTile(
         habit: habit,
         today: today,
         weekStart: weekStart,
+        onEdit: () => _openEditHabit(habit),
       ),
       SubAgendaItem(:final sub) => SubAnchorTile(sub: sub, today: today),
     };
+  }
+
+  /// 打开待办编辑页
+  void _openEditTodo(TodoItem item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AddTodoPage(editTodo: item)),
+    );
+  }
+
+  /// 打开习惯编辑页
+  void _openEditHabit(Habit habit) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AddTodoPage(editHabit: habit)),
+    );
   }
 
   // ── 日期聚类 ──────────────────────────────────────────
@@ -599,6 +618,12 @@ class _CompletedTodosView extends ConsumerWidget {
                       item: item,
                       today: now,
                       onToggle: () => toggleTodoWithNotifications(ref, item),
+                      onEdit: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddTodoPage(editTodo: item),
+                        ),
+                      ),
                     ),
                 ],
               );
