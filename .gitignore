@@ -66,6 +66,9 @@ node_modules/
 SESSION.md
 SUBSCRIPTION_CATEGORIES_RESEARCH.md
 
+# Internal dev agent instructions (local-only — contains local paths/tooling)
+AGENTS.md
+
 # Internal design docs, specs, prototypes, feedback, investigations
 docs/
 
