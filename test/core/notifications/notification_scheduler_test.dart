@@ -7,7 +7,6 @@ void main() {
     late NotificationScheduler scheduler;
     setUp(() => scheduler = NotificationScheduler());
 
-
     test('Todo notification ID = 1000000 + entity id', () {
       const id = 42;
       final notifyId = 1 * 1000000 + id;

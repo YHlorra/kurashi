@@ -17,10 +17,10 @@ class AddTodoPage extends ConsumerStatefulWidget {
   final Habit? editHabit;
 
   const AddTodoPage({super.key, this.editTodo, this.editHabit})
-      : assert(
-          editTodo == null || editHabit == null,
-          'editTodo 与 editHabit 不可同时指定',
-        );
+    : assert(
+        editTodo == null || editHabit == null,
+        'editTodo 与 editHabit 不可同时指定',
+      );
 
   @override
   ConsumerState<AddTodoPage> createState() => _AddTodoPageState();

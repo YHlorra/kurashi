@@ -72,7 +72,9 @@ class NotificationScheduler {
     }
     final scheduled = computeTodoReminderTime(item, DateTime.now());
     if (scheduled == null) {
-      debugPrint('[notify-skip] todo ${item.id} (no dueDate / completed / past)');
+      debugPrint(
+        '[notify-skip] todo ${item.id} (no dueDate / completed / past)',
+      );
       return;
     }
 
@@ -254,6 +256,23 @@ class NotificationScheduler {
       iOS: iosDetails,
     );
 
+    // iOS 通知权限：延迟请求（与 NotificationInitializer 注释设计一致）。
+    // _schedule 是四类提醒汇聚点，在此请求覆盖所有路径，恰为「首次创建提醒」时机。
+    // Android 权限已在 NotificationInitializer 启动时请求，此处不重复。
+    if (Platform.isIOS) {
+      final iosPlugin = _plugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      if (iosPlugin != null) {
+        await iosPlugin.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
+    }
+
     final tzScheduled = tz.TZDateTime.from(scheduled, tz.local);
     final mode = await _resolveAndroidScheduleMode();
     await _plugin.zonedSchedule(
@@ -276,18 +295,26 @@ class NotificationScheduler {
   /// 策略：
   /// - 非 Android（iOS）：exactAllowWhileIdle（iOS 无此权限概念，插件忽略模式差异）。
   /// - Android 且已授权：exactAllowWhileIdle（跨 Doze/待机持久，体验最佳）。
-  /// - Android 但未授权：降级 alarmClock——仍按精确时间触发（状态栏显示闹钟图标），
-  ///   且不需要 SCHEDULE_EXACT_ALARM 权限，保证「不崩 + 提醒照响」。
+  /// - Android 但未授权：降级 inexactAllowWhileIdle——用 setAndAllowWhileIdle,
+  ///   不需要 SCHEDULE_EXACT_ALARM 权限，能在 Doze 下触发，有 0-15 分钟延迟但保证能响。
+  ///
+  /// ponytail: 原降级用 alarmClock，但 flutter_local_notifications 22.x 原生层
+  /// （FlutterLocalNotificationsPlugin.java:748）alarmClock 分支也调用
+  /// checkCanScheduleExactAlarms()，未授权抛 ExactAlarmPermissionException，
+  /// 被 unawaited+catchError 吞掉 → 通知恒不响。inexactAllowWhileIdle 走
+  /// setAndAllowWhileIdle 路径，不检查权限，是真正的安全降级。
   Future<AndroidScheduleMode> _resolveAndroidScheduleMode() async {
     if (!Platform.isAndroid) return AndroidScheduleMode.exactAllowWhileIdle;
     final androidPlugin = _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin == null) return AndroidScheduleMode.exactAllowWhileIdle;
-    final canExact = await androidPlugin.canScheduleExactNotifications() ?? false;
+    final canExact =
+        await androidPlugin.canScheduleExactNotifications() ?? false;
     return canExact
         ? AndroidScheduleMode.exactAllowWhileIdle
-        : AndroidScheduleMode.alarmClock;
+        : AndroidScheduleMode.inexactAllowWhileIdle;
   }
 
   /// 引导用户授予精确闹钟权限（请求系统权限，Android 12+ 会引导至设置页）。
@@ -300,7 +327,8 @@ class NotificationScheduler {
     if (!Platform.isAndroid) return;
     final androidPlugin = _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin == null) return;
     if ((await androidPlugin.canScheduleExactNotifications()) != true) {
       await androidPlugin.requestExactAlarmsPermission();

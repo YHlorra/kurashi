@@ -61,51 +61,51 @@ class HabitTile extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                    Text(
-                      habit.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: -0.16,
-                        color: AppColors.fg,
+                      Text(
+                        habit.title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.16,
+                          color: AppColors.fg,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (habit.tag != null) ...[
-                          Container(
-                            constraints: const BoxConstraints(maxHeight: 18),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              habit.tag!,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.muted,
+                      const SizedBox(height: 2),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (habit.tag != null) ...[
+                            Container(
+                              constraints: const BoxConstraints(maxHeight: 18),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                habit.tag!,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.muted,
+                                ),
                               ),
                             ),
+                            const SizedBox(width: 6),
+                          ],
+                          Text(
+                            '本周 $n / $m 次 · 提醒 ${_reminderText(habit.reminderTime)}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.muted,
+                            ),
                           ),
-                          const SizedBox(width: 6),
                         ],
-                        Text(
-                          '本周 $n / $m 次 · 提醒 ${_reminderText(habit.reminderTime)}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.muted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               // checkin 按钮
